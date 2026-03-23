@@ -732,11 +732,17 @@
   </nav>
 
   <div class="sidebar-footer">
-    <div class="user-row">
-      <div class="avatar">AD</div>
+    <div id="firebaseStatus" style="background:var(--bg3);padding:8px 12px;border-radius:8px;margin-bottom:12px;text-align:center">
+      <div style="font-size:11px;color:var(--text3)">Database Status</div>
+      <div style="font-size:12px;font-weight:600;margin-top:2px" id="dbStatusText">
+        <span style="color:var(--warn)">⚠ Demo Mode</span>
+      </div>
+    </div>
+    <div class="user-row" id="userRow" onclick="showLoginModal()">
+      <div class="avatar">👤</div>
       <div>
-        <div class="user-name">Admin User</div>
-        <div class="user-role">Super Admin</div>
+        <div class="user-name">Sign In</div>
+        <div class="user-role" style="color:var(--accent)">Click to access your account</div>
       </div>
     </div>
   </div>
@@ -1988,7 +1994,7 @@
               <label class="form-label">Reference / Description</label>
               <input class="form-input" placeholder="e.g. Consultation co-pay" />
             </div>
-            <button class="btn btn-primary" style="width:100%" onclick="showToast('Payment request sent! Patient will receive M-Pesa prompt.', 'success')">
+            <button class="btn btn-primary" style="width:100%" onclick="sendMpesaRequest()">
               📱 Send Payment Request
             </button>
           </div>
@@ -2110,7 +2116,7 @@
               <div style="font-size:12px;color:var(--text3);margin-bottom:4px">Preview:</div>
               <div style="font-size:13px;color:var(--text)">"Jambo Sarah, this is a reminder of your appointment tomorrow at 9:00 AM with Dr. Ochieng at Kenyatta National Hospital. Reply CONFIRM to confirm or CANCEL to cancel."</div>
             </div>
-            <button class="btn btn-primary" style="width:100%" onclick="showToast('SMS sent to 24 patients!', 'success')">
+            <button class="btn btn-primary" style="width:100%" onclick="sendBulkSMS()">
               📱 Send to 24 Patients (KSh 24)
             </button>
           </div>
@@ -2608,7 +2614,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('appointmentModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="closeModal('appointmentModal');showToast('Appointment scheduled! SMS sent to patient.', 'success')">Schedule Appointment</button>
+      <button class="btn btn-primary" onclick="submitAppointment()">Schedule Appointment</button>
     </div>
   </div>
 </div>
@@ -2663,7 +2669,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('invoiceModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="closeModal('invoiceModal');showToast('Invoice created!', 'success')">Create Invoice</button>
+      <button class="btn btn-primary" onclick="submitInvoice()">Create Invoice</button>
     </div>
   </div>
 </div>
@@ -2765,11 +2771,306 @@
   </div>
 </div>
 
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <span style="font-size:28px">🔐</span>
+      <div class="modal-title">Sign In</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('loginModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:48px;margin-bottom:12px">🩺</div>
+        <div style="font-size:18px;font-weight:600;color:var(--text)">ClearCare Kenya</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:4px">Sign in to access your dashboard</div>
+      </div>
+      
+      <div id="loginForm">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" type="email" id="loginEmail" placeholder="admin@hospital.co.ke" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" id="loginPassword" placeholder="Enter your password" />
+        </div>
+        <button class="btn btn-primary" style="width:100%;padding:14px" onclick="signIn(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)">Sign In</button>
+        
+        <div style="text-align:center;margin-top:16px">
+          <span style="font-size:13px;color:var(--text2)">Don't have an account?</span>
+          <span style="font-size:13px;color:var(--accent);cursor:pointer;font-weight:600" onclick="document.getElementById('loginForm').style.display='none';document.getElementById('signupForm').style.display='block'"> Sign Up</span>
+        </div>
+      </div>
+      
+      <div id="signupForm" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input class="form-input" id="signupName" placeholder="John Kamau" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" type="email" id="signupEmail" placeholder="admin@hospital.co.ke" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" id="signupPassword" placeholder="Create a password (min 6 characters)" />
+        </div>
+        <button class="btn btn-primary" style="width:100%;padding:14px" onclick="signUp(document.getElementById('signupEmail').value, document.getElementById('signupPassword').value, document.getElementById('signupName').value)">Create Account</button>
+        
+        <div style="text-align:center;margin-top:16px">
+          <span style="font-size:13px;color:var(--text2)">Already have an account?</span>
+          <span style="font-size:13px;color:var(--accent);cursor:pointer;font-weight:600" onclick="document.getElementById('signupForm').style.display='none';document.getElementById('loginForm').style.display='block'"> Sign In</span>
+        </div>
+      </div>
+      
+      <div style="background:var(--bg3);padding:12px;border-radius:8px;margin-top:20px;text-align:center">
+        <div style="font-size:11px;color:var(--text3)">Firebase not configured? The system will run in demo mode without saving data.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div id="toast-container"></div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
-// ── NAVIGATION ──
+// ═══════════════════════════════════════════════════════════════
+// FIREBASE CONFIGURATION - Replace with your Firebase config
+// ═══════════════════════════════════════════════════════════════
+// To set up Firebase:
+// 1. Go to https://console.firebase.google.com
+// 2. Create a new project
+// 3. Add a Web App
+// 4. Copy your config below
+// 5. Enable Authentication (Email/Password)
+// 6. Create Firestore Database
+// ═══════════════════════════════════════════════════════════════
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase
+let db = null;
+let auth = null;
+let currentUser = null;
+let isFirebaseConnected = false;
+
+try {
+  if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    auth = firebase.auth();
+    isFirebaseConnected = true;
+    console.log('Firebase connected successfully!');
+  } else {
+    console.log('Firebase not configured - using demo mode');
+  }
+} catch (error) {
+  console.error('Firebase error:', error);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FIREBASE HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+
+async function saveToFirebase(collection, data) {
+  if (!isFirebaseConnected) {
+    showToast('Firebase not connected - data saved locally only', 'warn');
+    saveLocally(collection, data);
+    return null;
+  }
+  try {
+    const docRef = await db.collection(collection).add({
+      ...data,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Saved to database!', 'success');
+    return docRef.id;
+  } catch (error) {
+    console.error('Error saving:', error);
+    showToast('Error saving to database', 'error');
+    return null;
+  }
+}
+
+async function getFromFirebase(collection, limit = 50) {
+  if (!isFirebaseConnected) {
+    return getLocally(collection);
+  }
+  try {
+    const snapshot = await db.collection(collection)
+      .orderBy('createdAt', 'desc')
+      .limit(limit)
+      .get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error('Error fetching:', error);
+    return [];
+  }
+}
+
+async function updateInFirebase(collection, id, data) {
+  if (!isFirebaseConnected) {
+    showToast('Firebase not connected', 'warn');
+    return false;
+  }
+  try {
+    await db.collection(collection).doc(id).update({
+      ...data,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Updated successfully!', 'success');
+    return true;
+  } catch (error) {
+    console.error('Error updating:', error);
+    return false;
+  }
+}
+
+async function deleteFromFirebase(collection, id) {
+  if (!isFirebaseConnected) {
+    showToast('Firebase not connected', 'warn');
+    return false;
+  }
+  try {
+    await db.collection(collection).doc(id).delete();
+    showToast('Deleted successfully!', 'success');
+    return true;
+  } catch (error) {
+    console.error('Error deleting:', error);
+    return false;
+  }
+}
+
+// Local storage fallback
+function saveLocally(key, data) {
+  const existing = JSON.parse(localStorage.getItem('clearcare_' + key) || '[]');
+  existing.unshift({ ...data, localId: Date.now(), createdAt: new Date().toISOString() });
+  localStorage.setItem('clearcare_' + key, JSON.stringify(existing.slice(0, 100)));
+}
+
+function getLocally(key) {
+  return JSON.parse(localStorage.getItem('clearcare_' + key) || '[]');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUTHENTICATION
+// ═══════════════════════════════════════════════════════════════
+
+function showLoginModal() {
+  showModal('loginModal');
+}
+
+async function signIn(email, password) {
+  if (!isFirebaseConnected) {
+    showToast('Firebase not configured. Using demo mode.', 'warn');
+    closeModal('loginModal');
+    return;
+  }
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    showToast('Welcome back!', 'success');
+    closeModal('loginModal');
+  } catch (error) {
+    showToast('Login failed: ' + error.message, 'error');
+  }
+}
+
+async function signUp(email, password, name) {
+  if (!isFirebaseConnected) {
+    showToast('Firebase not configured. Using demo mode.', 'warn');
+    closeModal('loginModal');
+    return;
+  }
+  try {
+    await auth.createUserWithEmailAndPassword(email, password);
+    await db.collection('users').add({
+      email: email,
+      name: name,
+      role: 'staff',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Account created! Welcome!', 'success');
+    closeModal('loginModal');
+  } catch (error) {
+    showToast('Sign up failed: ' + error.message, 'error');
+  }
+}
+
+async function signOut() {
+  if (!isFirebaseConnected) {
+    showToast('Signed out (demo mode)', 'success');
+    return;
+  }
+  try {
+    await auth.signOut();
+    showToast('Signed out successfully', 'success');
+  } catch (error) {
+    showToast('Error signing out', 'error');
+  }
+}
+
+// Auth state listener
+if (auth) {
+  auth.onAuthStateChanged(user => {
+    currentUser = user;
+    updateAuthUI();
+  });
+}
+
+function updateAuthUI() {
+  const userRow = document.getElementById('userRow');
+  const dbStatusText = document.getElementById('dbStatusText');
+  if (!userRow) return;
+  
+  // Update database status
+  if (isFirebaseConnected) {
+    dbStatusText.innerHTML = '<span style="color:var(--success)">✅ Firebase Connected</span>';
+  } else {
+    dbStatusText.innerHTML = '<span style="color:var(--warn)">⚠ Demo Mode</span>';
+  }
+  
+  // Update user row
+  if (currentUser && isFirebaseConnected) {
+    userRow.innerHTML = `
+      <div class="avatar" onclick="signOut()" style="cursor:pointer">${currentUser.email[0].toUpperCase()}</div>
+      <div onclick="signOut()" style="cursor:pointer">
+        <div class="user-name">${currentUser.email.split('@')[0]}</div>
+        <div class="user-role" style="color:var(--accent)">Click to sign out</div>
+      </div>
+    `;
+  } else {
+    userRow.innerHTML = `
+      <div class="avatar">👤</div>
+      <div>
+        <div class="user-name">Guest User</div>
+        <div class="user-role" style="color:var(--accent)">Click to sign in</div>
+      </div>
+    `;
+  }
+}
+
+// Update status on load
+window.addEventListener('load', () => {
+  setTimeout(updateAuthUI, 500);
+});
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
 const pages = {
   dashboard: 'Home',
   coverage: 'Check Insurance',
@@ -2895,25 +3196,134 @@ function autoVerify() {
   }
 }
 
-function completeRegistration() {
-  showToast('Patient registered successfully! Added to waiting list.', 'success');
+// ── PATIENT REGISTRATION ──
+async function completeRegistration() {
+  const patientId = 'P-' + Math.floor(1000 + Math.random() * 9000);
+  const patientData = {
+    id: patientId,
+    firstName: 'New',
+    lastName: 'Patient',
+    phone: '0712 345 678',
+    insurance: 'NHIF',
+    memberId: 'NHIF-' + Math.floor(10000 + Math.random() * 90000),
+    status: 'registered',
+    queuePosition: 6
+  };
+  
+  await saveToFirebase('patients', patientData);
+  showToast(`Patient registered! ID: ${patientId}`, 'success');
   navigate('queue', document.querySelector('[onclick*=queue]'));
 }
 
 // ── PRE-AUTH SUBMIT ──
-function submitPreAuth() {
+async function submitPreAuth() {
+  const preAuthData = {
+    patientId: 'P-' + Math.floor(1000 + Math.random() * 9000),
+    patientName: document.querySelector('#preauthModal input')?.value || 'Unknown',
+    procedure: 'Medical Procedure',
+    insurance: 'NHIF',
+    status: 'pending',
+    priority: 'normal',
+    ref: 'PA-' + Math.floor(2000 + Math.random() * 1000)
+  };
+  
+  await saveToFirebase('preauths', preAuthData);
   closeModal('preauthModal');
-  showToast('Approval request submitted! You will be notified when processed.', 'success');
 }
 
-function submitReferral() {
+// ── REFERRAL SUBMIT ──
+async function submitReferral() {
+  const referralData = {
+    patientId: 'P-' + Math.floor(1000 + Math.random() * 9000),
+    patientName: 'Patient',
+    fromDoctor: 'Dr. Ochieng',
+    toSpecialist: 'Specialist',
+    reason: 'Referral required',
+    status: 'pending',
+    ref: 'REF-' + Math.floor(800 + Math.random() * 200)
+  };
+  
+  await saveToFirebase('referrals', referralData);
   closeModal('referralModal');
-  showToast('Referral sent successfully!', 'success');
 }
 
-function addTenant() {
+// ── APPOINTMENT SUBMIT ──
+async function submitAppointment() {
+  const appointmentData = {
+    patientId: 'P-' + Math.floor(1000 + Math.random() * 9000),
+    patientName: 'Patient',
+    doctor: 'Dr. Ochieng',
+    date: new Date().toISOString().split('T')[0],
+    time: '9:00 AM',
+    service: 'General Consultation',
+    status: 'confirmed'
+  };
+  
+  await saveToFirebase('appointments', appointmentData);
+  closeModal('appointmentModal');
+}
+
+// ── INVOICE SUBMIT ──
+async function submitInvoice() {
+  const invoiceData = {
+    patientId: 'P-' + Math.floor(1000 + Math.random() * 9000),
+    patientName: 'Patient',
+    items: 'Medical services',
+    subtotal: 5000,
+    insuranceCover: 3000,
+    patientPays: 2000,
+    paymentMethod: 'M-Pesa',
+    status: 'pending',
+    ref: 'INV-' + Math.floor(2000 + Math.random() * 500)
+  };
+  
+  await saveToFirebase('invoices', invoiceData);
+  closeModal('invoiceModal');
+}
+
+// ── M-PESA PAYMENT ──
+async function sendMpesaRequest() {
+  const mpesaData = {
+    patientName: 'Patient',
+    phone: '0712 345 678',
+    amount: 5000,
+    reference: 'Consultation co-pay',
+    status: 'pending',
+    timestamp: new Date().toISOString()
+  };
+  
+  await saveToFirebase('mpesa_transactions', mpesaData);
+  showToast('Payment request sent! Patient will receive M-Pesa prompt.', 'success');
+}
+
+// ── SEND SMS ──
+async function sendBulkSMS() {
+  const smsData = {
+    recipients: 24,
+    message: 'Appointment reminder',
+    status: 'sent',
+    cost: 24,
+    timestamp: new Date().toISOString()
+  };
+  
+  await saveToFirebase('sms_log', smsData);
+  showToast('SMS sent to 24 patients!', 'success');
+}
+
+// ── TENANT ADD ──
+async function addTenant() {
+  const tenantData = {
+    name: 'New Organization',
+    email: 'admin@hospital.co.ke',
+    phone: '+254 700 000 000',
+    plan: 'Professional',
+    users: 50,
+    status: 'active',
+    joinedDate: new Date().toISOString()
+  };
+  
+  await saveToFirebase('tenants', tenantData);
   closeModal('newTenantModal');
-  showToast('New tenant onboarded successfully!', 'success');
 }
 
 // ── PROVIDER LIST ──
