@@ -682,13 +682,41 @@
       <span class="nav-icon">🏥</span> Find Hospital
     </div>
 
-    <div class="nav-section">More</div>
+    <div class="nav-section">Patient Services</div>
+    <div class="nav-item" onclick="navigate('portal',this)">
+      <span class="nav-icon">👤</span> Patient Portal
+    </div>
+    <div class="nav-item" onclick="navigate('appointments',this)">
+      <span class="nav-icon">📅</span> Appointments
+      <span class="nav-badge ok">8</span>
+    </div>
+
+    <div class="nav-section">Billing & Payments</div>
+    <div class="nav-item" onclick="navigate('billing',this)">
+      <span class="nav-icon">💰</span> Billing
+    </div>
+    <div class="nav-item" onclick="navigate('mpesa',this)">
+      <span class="nav-icon">📱</span> M-Pesa
+    </div>
+    <div class="nav-item" onclick="navigate('sms',this)">
+      <span class="nav-icon">💬</span> SMS
+    </div>
+
+    <div class="nav-section">Operations</div>
     <div class="nav-item" onclick="navigate('queue',this)">
       <span class="nav-icon">📊</span> Waiting List
       <span class="nav-badge ok">12</span>
     </div>
+    <div class="nav-item" onclick="navigate('branches',this)">
+      <span class="nav-icon">🏢</span> Branches
+    </div>
+    <div class="nav-item" onclick="navigate('emails',this)">
+      <span class="nav-icon">📧</span> Email Alerts
+    </div>
+
+    <div class="nav-section">More</div>
     <div class="nav-item" onclick="navigate('ai',this)">
-      <span class="nav-icon">💬</span> Ask Help
+      <span class="nav-icon">🤖</span> AI Help
     </div>
     <div class="nav-item" onclick="navigate('analytics',this)">
       <span class="nav-icon">📈</span> Reports
@@ -699,7 +727,7 @@
       <span class="nav-icon">⚙</span> Settings
     </div>
     <div class="nav-item" onclick="navigate('tenants',this)">
-      <span class="nav-icon">🏢</span> Organizations
+      <span class="nav-icon">🏥</span> Organizations
     </div>
   </nav>
 
@@ -1594,6 +1622,723 @@
       </div>
     </div>
 
+    <!-- ══════════ PATIENT PORTAL ══════════ -->
+    <div class="page" id="page-portal">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">👤 Patient Self-Service</div>
+          </div>
+          <div class="panel-body">
+            <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:16px;margin-bottom:20px">
+              <div style="font-weight:600;color:#065f46;margin-bottom:8px">💡 Patient Portal Features</div>
+              <p style="font-size:13px;color:#047857">Patients can access their own coverage, book appointments, and view bills through this portal. Share the portal link with patients.</p>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Patient ID or Phone Number</label>
+              <div style="display:flex;gap:10px">
+                <input class="form-input" placeholder="e.g. #P-4821 or 0712 345 678" style="flex:1" />
+                <button class="btn btn-primary" onclick="showToast('Generating portal access link...', 'success')">Generate Link</button>
+              </div>
+            </div>
+
+            <div style="background:var(--bg3);padding:16px;border-radius:12px;margin-bottom:20px">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:8px;font-weight:600">SHAREABLE PORTAL LINK</div>
+              <div style="display:flex;gap:10px;align-items:center">
+                <code style="background:var(--bg2);padding:10px 14px;border-radius:8px;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis">https://clearcare.co.ke/patient/#P-4821</code>
+                <button class="btn btn-secondary btn-sm" onclick="showToast('Link copied to clipboard!', 'success')">📋 Copy</button>
+              </div>
+            </div>
+
+            <div class="grid-2" style="gap:16px">
+              <div style="background:var(--bg3);padding:16px;border-radius:12px;text-align:center">
+                <div style="font-size:28px;margin-bottom:8px">📋</div>
+                <div style="font-weight:600;margin-bottom:4px">View Coverage</div>
+                <div style="font-size:12px;color:var(--text2)">Patients check their insurance coverage anytime</div>
+              </div>
+              <div style="background:var(--bg3);padding:16px;border-radius:12px;text-align:center">
+                <div style="font-size:28px;margin-bottom:8px">📅</div>
+                <div style="font-weight:600;margin-bottom:4px">Book Appointments</div>
+                <div style="font-size:12px;color:var(--text2)">Schedule visits without calling the hospital</div>
+              </div>
+              <div style="background:var(--bg3);padding:16px;border-radius:12px;text-align:center">
+                <div style="font-size:28px;margin-bottom:8px">💳</div>
+                <div style="font-weight:600;margin-bottom:4px">View Bills</div>
+                <div style="font-size:12px;color:var(--text2)">Access invoices and payment history</div>
+              </div>
+              <div style="background:var(--bg3);padding:16px;border-radius:12px;text-align:center">
+                <div style="font-size:28px;margin-bottom:8px">📄</div>
+                <div style="font-weight:600;margin-bottom:4px">Download Records</div>
+                <div style="font-size:12px;color:var(--text2)">Get lab results and prescriptions</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📊 Recent Portal Activity</div>
+          </div>
+          <div class="panel-body">
+            <table>
+              <thead><tr><th>Patient</th><th>Action</th><th>Time</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Sarah M.</strong></td>
+                  <td><span class="badge badge-blue">Checked Coverage</span></td>
+                  <td>2 min ago</td>
+                </tr>
+                <tr>
+                  <td><strong>James K.</strong></td>
+                  <td><span class="badge badge-green">Booked Appointment</span></td>
+                  <td>15 min ago</td>
+                </tr>
+                <tr>
+                  <td><strong>Amira H.</strong></td>
+                  <td><span class="badge badge-gray">Viewed Bill</span></td>
+                  <td>1 hour ago</td>
+                </tr>
+                <tr>
+                  <td><strong>Tom L.</strong></td>
+                  <td><span class="badge badge-blue">Checked Coverage</span></td>
+                  <td>2 hours ago</td>
+                </tr>
+                <tr>
+                  <td><strong>Linda P.</strong></td>
+                  <td><span class="badge badge-green">Booked Appointment</span></td>
+                  <td>3 hours ago</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ APPOINTMENTS ══════════ -->
+    <div class="page" id="page-appointments">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:16px">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:22px">📅 Appointments</h2>
+          <p style="color:var(--text3);font-size:13px;margin-top:4px">Manage patient bookings and schedules</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="showModal('appointmentModal')">+ New Appointment</button>
+          <button class="btn btn-secondary">📅 Calendar View</button>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:24px">
+        <div class="stat-card green">
+          <div class="stat-icon">📅</div>
+          <div class="stat-label">Today's Appointments</div>
+          <div class="stat-value">24</div>
+          <div class="stat-delta up">↑ 5 from yesterday</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">✅</div>
+          <div class="stat-label">Completed Today</div>
+          <div class="stat-value">12</div>
+          <div class="stat-delta neutral">47% of total</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-label">Pending Confirmation</div>
+          <div class="stat-value">8</div>
+          <div class="stat-delta down">⚠️ 2 urgent</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📋 Appointment List</div>
+          <div style="display:flex;gap:8px">
+            <select class="form-select" style="width:auto;padding:6px 12px">
+              <option>All Status</option>
+              <option>Confirmed</option>
+              <option>Pending</option>
+              <option>Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Patient</th><th>Doctor</th><th>Date & Time</th><th>Service</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Sarah M.</strong><br><span style="font-size:11px;color:var(--text3)">#P-4821</span></td>
+              <td>Dr. Ochieng</td>
+              <td>Today, 9:00 AM</td>
+              <td>General Consultation</td>
+              <td><span class="badge badge-green">✓ Confirmed</span></td>
+              <td><button class="btn btn-secondary btn-sm">Reschedule</button></td>
+            </tr>
+            <tr>
+              <td><strong>James K.</strong><br><span style="font-size:11px;color:var(--text3)">#P-4820</span></td>
+              <td>Dr. Wanjiku</td>
+              <td>Today, 10:30 AM</td>
+              <td>Cardiology</td>
+              <td><span class="badge badge-yellow">⏳ Pending</span></td>
+              <td><button class="btn btn-primary btn-sm">Confirm</button></td>
+            </tr>
+            <tr>
+              <td><strong>Amira H.</strong><br><span style="font-size:11px;color:var(--text3)">#P-4819</span></td>
+              <td>Dr. Kiprop</td>
+              <td>Today, 11:00 AM</td>
+              <td>Lab Tests</td>
+              <td><span class="badge badge-green">✓ Confirmed</span></td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
+            </tr>
+            <tr>
+              <td><strong>Tom L.</strong><br><span style="font-size:11px;color:var(--text3)">#P-4818</span></td>
+              <td>Dr. Otieno</td>
+              <td>Today, 2:00 PM</td>
+              <td>MRI Scan</td>
+              <td><span class="badge badge-red">✗ Cancelled</span></td>
+              <td><button class="btn btn-secondary btn-sm">Reschedule</button></td>
+            </tr>
+            <tr>
+              <td><strong>Linda P.</strong><br><span style="font-size:11px;color:var(--text3)">#P-4817</span></td>
+              <td>Dr. Akinyi</td>
+              <td>Tomorrow, 9:30 AM</td>
+              <td>Physiotherapy</td>
+              <td><span class="badge badge-green">✓ Confirmed</span></td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════ BILLING ══════════ -->
+    <div class="page" id="page-billing">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:16px">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:22px">💰 Billing & Invoicing</h2>
+          <p style="color:var(--text3);font-size:13px;margin-top:4px">Generate bills, track payments, and manage invoices</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="showModal('invoiceModal')">+ Create Invoice</button>
+          <button class="btn btn-secondary">📊 Payment Report</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-icon">💵</div>
+          <div class="stat-label">Today's Revenue</div>
+          <div class="stat-value">KSh 186,500</div>
+          <div class="stat-delta up">↑ KSh 24,000 from yesterday</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">📋</div>
+          <div class="stat-label">Pending Invoices</div>
+          <div class="stat-value">KSh 425,000</div>
+          <div class="stat-delta down">⚠️ 18 unpaid</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-label">Overdue Payments</div>
+          <div class="stat-value">KSh 78,500</div>
+          <div class="stat-delta down">⚠️ 6 patients</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">✅</div>
+          <div class="stat-label">Collected This Month</div>
+          <div class="stat-value">KSh 3.2M</div>
+          <div class="stat-delta up">↑ 12% from last month</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📋 Recent Invoices</div>
+            <button class="btn btn-ghost btn-sm">View All</button>
+          </div>
+          <table>
+            <thead><tr><th>Invoice #</th><th>Patient</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="tag">INV-2045</span></td>
+                <td><strong>Sarah M.</strong></td>
+                <td>KSh 8,500</td>
+                <td><span class="badge badge-green">✓ Paid</span></td>
+              </tr>
+              <tr>
+                <td><span class="tag">INV-2044</span></td>
+                <td><strong>James K.</strong></td>
+                <td>KSh 15,000</td>
+                <td><span class="badge badge-yellow">⏳ Pending</span></td>
+              </tr>
+              <tr>
+                <td><span class="tag">INV-2043</span></td>
+                <td><strong>Amira H.</strong></td>
+                <td>KSh 3,200</td>
+                <td><span class="badge badge-green">✓ Paid</span></td>
+              </tr>
+              <tr>
+                <td><span class="tag">INV-2042</span></td>
+                <td><strong>Tom L.</strong></td>
+                <td>KSh 45,000</td>
+                <td><span class="badge badge-red">⚠ Overdue</span></td>
+              </tr>
+              <tr>
+                <td><span class="tag">INV-2041</span></td>
+                <td><strong>Linda P.</strong></td>
+                <td>KSh 12,800</td>
+                <td><span class="badge badge-green">✓ Paid</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">💳 Payment Methods</div>
+          </div>
+          <div class="panel-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+              <div style="background:#ecfdf5;padding:20px;border-radius:12px;text-align:center;border:1px solid #a7f3d0">
+                <div style="font-size:32px;margin-bottom:8px">📱</div>
+                <div style="font-weight:600;margin-bottom:4px">M-Pesa</div>
+                <div style="font-size:24px;font-weight:700;color:#059669">KSh 142,000</div>
+                <div style="font-size:12px;color:var(--text2);margin-top:4px">76 transactions</div>
+              </div>
+              <div style="background:#dbeafe;padding:20px;border-radius:12px;text-align:center;border:1px solid #93c5fd">
+                <div style="font-size:32px;margin-bottom:8px">💵</div>
+                <div style="font-weight:600;margin-bottom:4px">Cash</div>
+                <div style="font-size:24px;font-weight:700;color:#1e40af">KSh 38,500</div>
+                <div style="font-size:12px;color:var(--text2);margin-top:4px">24 transactions</div>
+              </div>
+              <div style="background:#fef3c7;padding:20px;border-radius:12px;text-align:center;border:1px solid #fde68a">
+                <div style="font-size:32px;margin-bottom:8px">🏦</div>
+                <div style="font-weight:600;margin-bottom:4px">Insurance</div>
+                <div style="font-size:24px;font-weight:700;color:#92400e">KSh 6,000</div>
+                <div style="font-size:12px;color:var(--text2);margin-top:4px">3 claims</div>
+              </div>
+              <div style="background:#ede9fe;padding:20px;border-radius:12px;text-align:center;border:1px solid #c4b5fd">
+                <div style="font-size:32px;margin-bottom:8px">💳</div>
+                <div style="font-weight:600;margin-bottom:4px">Card</div>
+                <div style="font-size:24px;font-weight:700;color:#5b21b6">KSh 0</div>
+                <div style="font-size:12px;color:var(--text2);margin-top:4px">No transactions</div>
+              </div>
+            </div>
+            <button class="btn btn-secondary" style="width:100%" onclick="navigate('mpesa',document.querySelector('[onclick*=mpesa]'))">View M-Pesa Transactions →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ M-PESA ══════════ -->
+    <div class="page" id="page-mpesa">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:16px">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:22px">📱 M-Pesa Integration</h2>
+          <p style="color:var(--text3);font-size:13px;margin-top:4px">Process payments and co-pays via M-Pesa</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div class="badge badge-green" style="padding:8px 16px;font-size:13px">● Connected to Safaricom API</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-icon">📱</div>
+          <div class="stat-label">M-Pesa Today</div>
+          <div class="stat-value">KSh 142,000</div>
+          <div class="stat-delta up">↑ 76 transactions</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-label">Pending Payments</div>
+          <div class="stat-value">KSh 18,500</div>
+          <div class="stat-delta down">⚠️ 5 awaiting confirmation</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">✅</div>
+          <div class="stat-label">Success Rate</div>
+          <div class="stat-value">98.5%</div>
+          <div class="stat-delta up">↑ 2.1% from last week</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">💰 Send Payment Request</div>
+          </div>
+          <div class="panel-body">
+            <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:16px;margin-bottom:20px">
+              <div style="font-size:13px;color:#047857">Enter patient phone number and amount to send them an M-Pesa payment request. They will receive a prompt on their phone.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Patient Name</label>
+              <input class="form-input" placeholder="e.g. Sarah M." />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number (M-Pesa registered)</label>
+              <input class="form-input" placeholder="e.g. 0712 345 678" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (KSh)</label>
+              <input class="form-input" type="number" placeholder="e.g. 5000" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Reference / Description</label>
+              <input class="form-input" placeholder="e.g. Consultation co-pay" />
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="showToast('Payment request sent! Patient will receive M-Pesa prompt.', 'success')">
+              📱 Send Payment Request
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📋 Recent M-Pesa Transactions</div>
+          </div>
+          <table>
+            <thead><tr><th>Time</th><th>Patient</th><th>Phone</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>9:45 AM</td>
+                <td><strong>Sarah M.</strong></td>
+                <td>0712 345 678</td>
+                <td>KSh 8,500</td>
+                <td><span class="badge badge-green">✓ Complete</span></td>
+              </tr>
+              <tr>
+                <td>9:30 AM</td>
+                <td><strong>James K.</strong></td>
+                <td>0722 456 789</td>
+                <td>KSh 3,000</td>
+                <td><span class="badge badge-green">✓ Complete</span></td>
+              </tr>
+              <tr>
+                <td>9:15 AM</td>
+                <td><strong>Amira H.</strong></td>
+                <td>0711 222 333</td>
+                <td>KSh 1,500</td>
+                <td><span class="badge badge-yellow">⏳ Pending</span></td>
+              </tr>
+              <tr>
+                <td>8:50 AM</td>
+                <td><strong>Tom L.</strong></td>
+                <td>0700 111 222</td>
+                <td>KSh 15,000</td>
+                <td><span class="badge badge-green">✓ Complete</span></td>
+              </tr>
+              <tr>
+                <td>8:30 AM</td>
+                <td><strong>Linda P.</strong></td>
+                <td>0723 789 012</td>
+                <td>KSh 2,000</td>
+                <td><span class="badge badge-green">✓ Complete</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SMS NOTIFICATIONS ══════════ -->
+    <div class="page" id="page-sms">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:16px">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:22px">💬 SMS Notifications</h2>
+          <p style="color:var(--text3);font-size:13px;margin-top:4px">Send appointment reminders and alerts via SMS</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div class="badge badge-green" style="padding:8px 16px;font-size:13px">● 847 SMS sent this month</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card green">
+          <div class="stat-icon">📱</div>
+          <div class="stat-label">SMS Sent Today</div>
+          <div class="stat-value">42</div>
+          <div class="stat-delta neutral">KSh 420 total cost</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">✅</div>
+          <div class="stat-label">Delivered</div>
+          <div class="stat-value">98%</div>
+          <div class="stat-delta up">41 of 42 messages</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">SMS Balance</div>
+          <div class="stat-value">KSh 12,500</div>
+          <div class="stat-delta neutral">~1,250 messages left</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📝 Send SMS</div>
+          </div>
+          <div class="panel-body">
+            <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:16px;margin-bottom:20px">
+              <div style="font-size:13px;color:#047857">Send SMS reminders to patients. Cost is KSh 1 per SMS.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Select Patients</label>
+              <select class="form-select">
+                <option>All patients with appointments today</option>
+                <option>Specific patients...</option>
+                <option>All registered patients</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Message Template</label>
+              <select class="form-select" onchange="if(this.value==='custom'){document.getElementById('customMsg').style.display='block'}else{document.getElementById('customMsg').style.display='none'}">
+                <option>Appointment Reminder</option>
+                <option>Insurance Approval Ready</option>
+                <option>Payment Reminder</option>
+                <option>Lab Results Ready</option>
+                <option>Custom Message</option>
+              </select>
+            </div>
+            <div class="form-group" id="customMsg" style="display:none">
+              <label class="form-label">Custom Message</label>
+              <textarea class="form-textarea" placeholder="Type your custom message here..."></textarea>
+            </div>
+            <div style="background:var(--bg3);padding:12px;border-radius:8px;margin-bottom:16px">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:4px">Preview:</div>
+              <div style="font-size:13px;color:var(--text)">"Jambo Sarah, this is a reminder of your appointment tomorrow at 9:00 AM with Dr. Ochieng at Kenyatta National Hospital. Reply CONFIRM to confirm or CANCEL to cancel."</div>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="showToast('SMS sent to 24 patients!', 'success')">
+              📱 Send to 24 Patients (KSh 24)
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📋 SMS Templates</div>
+          </div>
+          <div class="panel-body" style="padding:0">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+              <div style="font-weight:600;margin-bottom:4px">Appointment Reminder</div>
+              <div style="font-size:12px;color:var(--text2)">"Jambo {name}, this is a reminder of your appointment on {date} at {time} with {doctor}. Reply CONFIRM or CANCEL."</div>
+              <button class="btn btn-secondary btn-sm" style="margin-top:8px">Edit</button>
+            </div>
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+              <div style="font-weight:600;margin-bottom:4px">Insurance Approval Ready</div>
+              <div style="font-size:12px;color:var(--text2)">"Jambo {name}, your insurance approval (Ref: {ref}) has been processed. Please arrive 30 minutes early."</div>
+              <button class="btn btn-secondary btn-sm" style="margin-top:8px">Edit</button>
+            </div>
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+              <div style="font-weight:600;margin-bottom:4px">Payment Reminder</div>
+              <div style="font-size:12px;color:var(--text2)">"Jambo {name}, your outstanding balance of KSh {amount} is due. Please pay via M-Pesa to {till} or visit reception."</div>
+              <button class="btn btn-secondary btn-sm" style="margin-top:8px">Edit</button>
+            </div>
+            <div style="padding:16px 20px">
+              <div style="font-weight:600;margin-bottom:4px">Lab Results Ready</div>
+              <div style="font-size:12px;color:var(--text2)">"Jambo {name}, your lab results are ready. Please collect them from reception or view in the patient portal."</div>
+              <button class="btn btn-secondary btn-sm" style="margin-top:8px">Edit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ BRANCHES ══════════ -->
+    <div class="page" id="page-branches">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:16px">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:22px">🏢 Multi-Branch Management</h2>
+          <p style="color:var(--text3);font-size:13px;margin-top:4px">Manage multiple hospital locations and view consolidated data</p>
+        </div>
+        <button class="btn btn-primary" onclick="showModal('branchModal')">+ Add Branch</button>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:24px">
+        <div class="stat-card green">
+          <div class="stat-icon">🏥</div>
+          <div class="stat-label">Total Branches</div>
+          <div class="stat-value">4</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">👥</div>
+          <div class="stat-label">Total Patients</div>
+          <div class="stat-value">4,280</div>
+          <div class="stat-delta up">↑ 124 this week</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">Combined Revenue</div>
+          <div class="stat-value">KSh 8.4M</div>
+          <div class="stat-delta up">↑ 15% this month</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📍 Branch Locations</div>
+        </div>
+        <table>
+          <thead><tr><th>Branch</th><th>Location</th><th>Patients Today</th><th>Revenue Today</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>🏥 Kenyatta National Hospital</strong></td>
+              <td>Nairobi CBD</td>
+              <td>142</td>
+              <td>KSh 425,000</td>
+              <td><span class="badge badge-green">● Active</span></td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
+            </tr>
+            <tr>
+              <td><strong>🏥 Nairobi West Medical Centre</strong></td>
+              <td>Nairobi West</td>
+              <td>86</td>
+              <td>KSh 218,500</td>
+              <td><span class="badge badge-green">● Active</span></td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
+            </tr>
+            <tr>
+              <td><strong>🏥 Mombasa Health Center</strong></td>
+              <td>Mombasa</td>
+              <td>54</td>
+              <td>KSh 142,000</td>
+              <td><span class="badge badge-green">● Active</span></td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
+            </tr>
+            <tr>
+              <td><strong>🏥 Kisumu Regional Hospital</strong></td>
+              <td>Kisumu</td>
+              <td>38</td>
+              <td>KSh 95,000</td>
+              <td><span class="badge badge-yellow">⚠ Limited</span></td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════ EMAIL ALERTS ══════════ -->
+    <div class="page" id="page-emails">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:16px">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:22px">📧 Email Alerts</h2>
+          <p style="color:var(--text3);font-size:13px;margin-top:4px">Configure automatic email notifications for urgent events</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div class="badge badge-green" style="padding:8px 16px;font-size:13px">● 124 emails sent this week</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">⚙️ Alert Configuration</div>
+          </div>
+          <div class="panel-body">
+            <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:16px;margin-bottom:20px">
+              <div style="font-size:13px;color:#92400e">Configure which events trigger email alerts and who receives them.</div>
+            </div>
+
+            <div style="margin-bottom:20px">
+              <div style="font-weight:600;margin-bottom:12px">Alert Recipients</div>
+              <div class="form-group">
+                <label class="form-label">Manager Email</label>
+                <input class="form-input" value="manager@kenyatta-hospital.go.ke" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Operations Email</label>
+                <input class="form-input" value="ops@kenyatta-hospital.go.ke" />
+              </div>
+            </div>
+
+            <div style="font-weight:600;margin-bottom:12px">Auto-Email Triggers</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px">
+                <div>
+                  <div style="font-weight:500;margin-bottom:2px">Urgent Pre-Auth Request</div>
+                  <div style="font-size:12px;color:var(--text2)">Email when pre-auth is marked urgent</div>
+                </div>
+                <label class="switch"><input type="checkbox" checked style="width:20px;height:20px"></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px">
+                <div>
+                  <div style="font-weight:500;margin-bottom:2px">Insurance Denial</div>
+                  <div style="font-size:12px;color:var(--text2)">Email when a claim is denied</div>
+                </div>
+                <label class="switch"><input type="checkbox" checked style="width:20px;height:20px"></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px">
+                <div>
+                  <div style="font-weight:500;margin-bottom:2px">Overdue Payments</div>
+                  <div style="font-size:12px;color:var(--text2)">Daily email for unpaid invoices > 7 days</div>
+                </div>
+                <label class="switch"><input type="checkbox" checked style="width:20px;height:20px"></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px">
+                <div>
+                  <div style="font-weight:500;margin-bottom:2px">Daily Summary Report</div>
+                  <div style="font-size:12px;color:var(--text2)">Send summary at end of each day</div>
+                </div>
+                <label class="switch"><input type="checkbox" style="width:20px;height:20px"></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg3);border-radius:10px">
+                <div>
+                  <div style="font-weight:500;margin-bottom:2px">New Patient Registration</div>
+                  <div style="font-size:12px;color:var(--text2)">Email for each new registration</div>
+                </div>
+                <label class="switch"><input type="checkbox" style="width:20px;height:20px"></label>
+              </div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;margin-top:20px" onclick="showToast('Email alerts configured!', 'success')">Save Configuration</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📋 Recent Alert Emails</div>
+          </div>
+          <table>
+            <thead><tr><th>Time</th><th>Alert Type</th><th>Recipient</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Today 9:45 AM</td>
+                <td><span class="badge badge-red">Urgent Pre-Auth</span></td>
+                <td>manager@kenyatta...</td>
+                <td><span class="badge badge-green">✓ Sent</span></td>
+              </tr>
+              <tr>
+                <td>Today 8:30 AM</td>
+                <td><span class="badge badge-red">Insurance Denial</span></td>
+                <td>manager@kenyatta...</td>
+                <td><span class="badge badge-green">✓ Sent</span></td>
+              </tr>
+              <tr>
+                <td>Yesterday 5:00 PM</td>
+                <td><span class="badge badge-yellow">Daily Summary</span></td>
+                <td>ops@kenyatta...</td>
+                <td><span class="badge badge-green">✓ Sent</span></td>
+              </tr>
+              <tr>
+                <td>Yesterday 4:00 PM</td>
+                <td><span class="badge badge-red">Urgent Pre-Auth</span></td>
+                <td>manager@kenyatta...</td>
+                <td><span class="badge badge-green">✓ Sent</span></td>
+              </tr>
+              <tr>
+                <td>Mar 21, 5:00 PM</td>
+                <td><span class="badge badge-yellow">Daily Summary</span></td>
+                <td>ops@kenyatta...</td>
+                <td><span class="badge badge-red">✗ Failed</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- ══════════ TENANT MANAGEMENT ══════════ -->
     <div class="page" id="page-tenants">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
@@ -1799,6 +2544,130 @@
   </div>
 </div>
 
+<!-- Appointment Modal -->
+<div class="modal-overlay" id="appointmentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:22px">📅</span>
+      <div class="modal-title">Schedule New Appointment</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('appointmentModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:16px;margin-bottom:20px">
+        <div style="font-size:13px;color:#047857">Book an appointment for a patient. They will receive an SMS confirmation.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Patient Name</label>
+        <input class="form-input" placeholder="e.g. Sarah M." />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input class="form-input" type="date" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Time</label>
+          <select class="form-select">
+            <option>9:00 AM</option>
+            <option>9:30 AM</option>
+            <option>10:00 AM</option>
+            <option>10:30 AM</option>
+            <option>11:00 AM</option>
+            <option>11:30 AM</option>
+            <option>2:00 PM</option>
+            <option>2:30 PM</option>
+            <option>3:00 PM</option>
+            <option>3:30 PM</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Doctor</label>
+        <select class="form-select">
+          <option>Dr. Ochieng (General Physician)</option>
+          <option>Dr. Wanjiku (Cardiologist)</option>
+          <option>Dr. Kiprop (Neurologist)</option>
+          <option>Dr. Otieno (Orthopedic)</option>
+          <option>Dr. Akinyi (Pediatrician)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Service Type</label>
+        <select class="form-select">
+          <option>General Consultation</option>
+          <option>Specialist Visit</option>
+          <option>Lab Tests</option>
+          <option>Vaccination</option>
+          <option>Follow-up</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <input type="checkbox" id="sendSMS" checked style="width:18px;height:18px" />
+        <label for="sendSMS" style="font-size:14px;color:var(--text2);cursor:pointer">Send SMS reminder to patient</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('appointmentModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('appointmentModal');showToast('Appointment scheduled! SMS sent to patient.', 'success')">Schedule Appointment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Invoice Modal -->
+<div class="modal-overlay" id="invoiceModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:22px">💰</span>
+      <div class="modal-title">Create Invoice</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('invoiceModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Patient Name</label>
+        <input class="form-input" placeholder="e.g. Sarah M." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Service Description</label>
+        <textarea class="form-textarea" placeholder="e.g. General consultation, Lab tests (CBC, Lipid Profile)"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Subtotal (KSh)</label>
+          <input class="form-input" type="number" placeholder="e.g. 5000" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Insurance Cover (KSh)</label>
+          <input class="form-input" type="number" placeholder="e.g. 3000" />
+        </div>
+      </div>
+      <div style="background:var(--bg3);padding:16px;border-radius:12px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span>Subtotal:</span><span>KSh 5,000</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span>Insurance Cover:</span><span style="color:var(--success)">- KSh 3,000</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px;padding-top:8px;border-top:1px solid var(--border)">
+          <span>Patient Pays:</span><span style="color:var(--accent)">KSh 2,000</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payment Method</label>
+        <select class="form-select">
+          <option>M-Pesa</option>
+          <option>Cash</option>
+          <option>Insurance Claim</option>
+          <option>To be paid later</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('invoiceModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('invoiceModal');showToast('Invoice created!', 'success')">Create Invoice</button>
+    </div>
+  </div>
+</div>
+
 <!-- New Tenant Modal -->
 <div class="modal-overlay" id="newTenantModal">
   <div class="modal">
@@ -1908,8 +2777,15 @@ const pages = {
   preauth: 'Insurance Approval',
   referrals: 'Send Referral',
   providers: 'Find Hospital',
+  portal: 'Patient Portal',
+  appointments: 'Appointments',
+  billing: 'Billing',
+  mpesa: 'M-Pesa',
+  sms: 'SMS Notifications',
   queue: 'Waiting List',
-  ai: 'Ask Help',
+  branches: 'Branches',
+  emails: 'Email Alerts',
+  ai: 'AI Help',
   analytics: 'Reports',
   settings: 'Settings',
   tenants: 'Organizations'
