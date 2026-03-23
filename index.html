@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClearCare — Insurance Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #0f1423;
+    --bg3: #141929;
+    --card: #161d2e;
+    --card2: #1c2438;
+    --border: #232d42;
+    --border2: #2a3550;
+    --accent: #00d4aa;
+    --accent2: #0099ff;
+    --accent3: #7c3aed;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --success: #10b981;
+    --text: #e8edf8;
+    --text2: #8b97b8;
+    --text3: #5a6785;
+    --glow: 0 0 30px rgba(0,212,170,0.15);
+    --glow2: 0 0 30px rgba(0,153,255,0.15);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content:'';
+    position: fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(0,212,170,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,170,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 260px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    transition: transform .3s ease;
+  }
+
+  .logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-mark {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+  .logo-sub {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .tenant-badge {
+    margin: 16px;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .tenant-badge:hover { border-color: var(--accent); }
+  .tenant-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .tenant-plan { font-size: 11px; color: var(--accent); margin-top: 2px; }
+
+  .nav { padding: 8px 12px; flex: 1; overflow-y: auto; }
+  .nav-section { font-size: 10px; font-weight: 600; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; padding: 16px 12px 6px; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text2);
+    transition: all .2s;
+    position: relative;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--card); color: var(--text); }
+  .nav-item.active { background: rgba(0,212,170,0.1); color: var(--accent); }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 20%; bottom: 20%;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 0 2px 2px 0;
+  }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--danger);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+  }
+  .nav-badge.warn { background: var(--warn); color: #1a0e00; }
+  .nav-badge.ok { background: var(--success); }
+
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .user-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .user-row:hover { background: var(--card); }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .user-name { font-size: 13px; font-weight: 600; }
+  .user-role { font-size: 11px; color: var(--text3); }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  .topbar {
+    height: 64px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    gap: 16px;
+    background: rgba(10,14,26,0.8);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .topbar-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--text);
+    flex: 1;
+  }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #001a14;
+  }
+  .btn-primary:hover { background: #00efc2; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,212,170,0.3); }
+  .btn-secondary {
+    background: var(--card2);
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-ghost { background: transparent; color: var(--text2); }
+  .btn-ghost:hover { color: var(--text); background: var(--card); }
+  .btn-danger { background: rgba(239,68,68,0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+  .btn-warn { background: rgba(245,158,11,0.1); color: var(--warn); border: 1px solid rgba(245,158,11,0.3); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  .content { padding: 28px 32px; }
+
+  /* ── PAGES ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── STAT CARDS ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s, transform .2s;
+  }
+  .stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.08;
+  }
+  .stat-card.green::after { background: var(--accent); }
+  .stat-card.blue::after { background: var(--accent2); }
+  .stat-card.warn::after { background: var(--warn); }
+  .stat-card.purple::after { background: var(--accent3); }
+
+  .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text3); margin-bottom: 8px; }
+  .stat-value { font-size: 30px; font-weight: 300; font-family: 'DM Serif Display', serif; color: var(--text); line-height: 1; }
+  .stat-delta { font-size: 12px; margin-top: 6px; }
+  .stat-delta.up { color: var(--success); }
+  .stat-delta.down { color: var(--danger); }
+  .stat-delta.neutral { color: var(--text3); }
+
+  /* ── PANEL ── */
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .panel-title { font-size: 15px; font-weight: 600; color: var(--text); flex: 1; }
+  .panel-body { padding: 22px; }
+
+  /* ── GRID LAYOUTS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-65-35 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text3); padding: 10px 16px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 13px 16px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-green { background: rgba(16,185,129,0.15); color: var(--success); }
+  .badge-yellow { background: rgba(245,158,11,0.15); color: var(--warn); }
+  .badge-red { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .badge-blue { background: rgba(0,153,255,0.15); color: var(--accent2); }
+  .badge-purple { background: rgba(124,58,237,0.15); color: #a78bfa; }
+  .badge-gray { background: rgba(255,255,255,0.07); color: var(--text3); }
+
+  /* ── FORM ── */
+  .form-group { margin-bottom: 18px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; letter-spacing: 0.3px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color .2s;
+    outline: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,212,170,0.08);
+  }
+  .form-select option { background: var(--bg3); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  /* ── PROGRESS ── */
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--accent);
+    transition: width 1s ease;
+  }
+  .progress-fill.warn { background: var(--warn); }
+  .progress-fill.danger { background: var(--danger); }
+  .progress-fill.blue { background: var(--accent2); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    width: min(640px, 90vw);
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: slideUp .25s ease;
+  }
+  @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+  .modal-header {
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .modal-title { font-size: 18px; font-family: 'DM Serif Display', serif; flex: 1; }
+  .modal-body { padding: 22px 24px; }
+  .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ── COVERAGE CHECKER ── */
+  .coverage-result {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+  .coverage-item {
+    display: flex; align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    font-size: 13px;
+  }
+  .coverage-item:last-child { border-bottom: none; }
+  .cov-icon { font-size: 18px; flex-shrink: 0; }
+  .cov-label { flex: 1; font-weight: 500; }
+  .cov-value { color: var(--text2); }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before {
+    content: '';
+    position: absolute; left: 8px; top: 6px; bottom: 6px;
+    width: 2px; background: var(--border);
+  }
+  .timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+    font-size: 13px;
+  }
+  .timeline-dot {
+    position: absolute; left: -20px; top: 3px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 2px solid var(--bg3);
+  }
+  .timeline-dot.done { background: var(--success); }
+  .timeline-dot.active { background: var(--accent); box-shadow: 0 0 0 4px rgba(0,212,170,0.2); }
+  .timeline-dot.pending { background: var(--warn); }
+  .timeline-dot.blocked { background: var(--danger); }
+  .timeline-date { font-size: 11px; color: var(--text3); margin-bottom: 2px; }
+  .timeline-text { color: var(--text2); }
+  .timeline-text strong { color: var(--text); }
+
+  /* ── CHAT AI ── */
+  .ai-chat {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .ai-messages {
+    height: 280px;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+  }
+  .msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .msg-ai {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    align-self: flex-start;
+    color: var(--text);
+  }
+  .msg-user {
+    background: rgba(0,212,170,0.1);
+    border: 1px solid rgba(0,212,170,0.2);
+    align-self: flex-end;
+    color: var(--text);
+  }
+  .msg-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; color: var(--text3); }
+  .ai-input-row {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 8px;
+  }
+  .ai-typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; }
+  .ai-typing span {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--text3);
+    animation: typing .9s infinite;
+  }
+  .ai-typing span:nth-child(2) { animation-delay: .2s; }
+  .ai-typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes typing { 0%,80%,100%{opacity:.3;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
+
+  /* ── NOTIFICATION TOAST ── */
+  #toast-container {
+    position: fixed; bottom: 24px; right: 24px;
+    z-index: 9999;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .toast {
+    background: var(--card2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px;
+    min-width: 280px;
+    animation: slideIn .3s ease;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  .toast.success { border-left: 3px solid var(--success); }
+  .toast.warn { border-left: 3px solid var(--warn); }
+  .toast.error { border-left: 3px solid var(--danger); }
+  @keyframes slideIn { from { opacity:0; transform: translateX(20px); } }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ── MISC ── */
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; font-family: 'JetBrains Mono', monospace; background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+  .empty-state { text-align: center; padding: 40px; color: var(--text3); }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  .section-gap { margin-bottom: 20px; }
+
+  .info-box {
+    background: rgba(0,153,255,0.06);
+    border: 1px solid rgba(0,153,255,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text2);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .info-box .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .step-indicator {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 28px;
+  }
+  .step {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; color: var(--text3);
+  }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--border); color: var(--text3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .step.active .step-num { background: var(--accent); color: #001a14; }
+  .step.done .step-num { background: var(--success); color: white; }
+  .step.active { color: var(--text); }
+  .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 8px; min-width: 24px; }
+
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .quick-action {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all .2s;
+    text-align: center;
+  }
+  .quick-action:hover { border-color: var(--accent); background: rgba(0,212,170,0.04); transform: translateY(-2px); }
+  .quick-action .qa-icon { font-size: 24px; margin-bottom: 8px; }
+  .quick-action .qa-label { font-size: 12px; font-weight: 600; color: var(--text2); }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .chip:hover, .chip.active { border-color: var(--accent); color: var(--accent); background: rgba(0,212,170,0.06); }
+
+  /* ── DONUT CHART ── */
+  .donut-wrap { display: flex; align-items: center; gap: 24px; }
+  .donut-legend { flex: 1; }
+  .donut-item { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 4px 0; }
+  .donut-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .mini-kpi {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .mini-kpi-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .mini-kpi-val { font-size: 20px; font-weight: 600; color: var(--text); }
+
+  .two-col-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .grid-2, .grid-65-35, .grid-3 { grid-template-columns: 1fr; }
+    .quick-actions { grid-template-columns: repeat(2, 1fr); }
+    .form-row, .two-col-form { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-mark">✦ ClearCare</div>
+    <div class="logo-sub">Insurance Intelligence</div>
+  </div>
+
+  <div class="tenant-badge" onclick="showModal('tenantModal')">
+    <div class="tenant-name" id="tenantName">🏥 Kenyatta National Hospital</div>
+    <div class="tenant-plan">Enterprise Plan · 8 insurance partners</div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-section">Main Menu</div>
+    <div class="nav-item active" onclick="navigate('dashboard',this)">
+      <span class="nav-icon">🏠</span> Home
+    </div>
+    <div class="nav-item" onclick="navigate('coverage',this)">
+      <span class="nav-icon">✅</span> Check Insurance
+    </div>
+
+    <div class="nav-section">Patient Services</div>
+    <div class="nav-item" onclick="navigate('registration',this)">
+      <span class="nav-icon">📝</span> Register Patient
+    </div>
+    <div class="nav-item" onclick="navigate('preauth',this)">
+      <span class="nav-icon">📋</span> Insurance Approval
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" onclick="navigate('referrals',this)">
+      <span class="nav-icon">🔄</span> Send Referral
+      <span class="nav-badge warn">5</span>
+    </div>
+    <div class="nav-item" onclick="navigate('providers',this)">
+      <span class="nav-icon">🏥</span> Find Hospital
+    </div>
+
+    <div class="nav-section">More</div>
+    <div class="nav-item" onclick="navigate('queue',this)">
+      <span class="nav-icon">📊</span> Waiting List
+      <span class="nav-badge ok">12</span>
+    </div>
+    <div class="nav-item" onclick="navigate('ai',this)">
+      <span class="nav-icon">💬</span> Ask Help
+    </div>
+    <div class="nav-item" onclick="navigate('analytics',this)">
+      <span class="nav-icon">📈</span> Reports
+    </div>
+
+    <div class="nav-section">Settings</div>
+    <div class="nav-item" onclick="navigate('settings',this)">
+      <span class="nav-icon">⚙</span> Settings
+    </div>
+    <div class="nav-item" onclick="navigate('tenants',this)">
+      <span class="nav-icon">🏢</span> Organizations
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar">AD</div>
+      <div>
+        <div class="user-name">Admin User</div>
+        <div class="user-role">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <button class="btn btn-ghost" id="menuBtn" onclick="toggleSidebar()" style="display:none;">☰</button>
+    <div class="topbar-title" id="topbarTitle">Home</div>
+    <div class="topbar-actions">
+      <span style="font-size:12px;color:var(--text3);" id="clockEl"></span>
+      <button class="btn btn-secondary btn-sm" onclick="showModal('alertModal')">🔔 <span style="color:var(--danger);font-weight:700;">4</span></button>
+      <button class="btn btn-primary btn-sm" onclick="navigate('registration', document.querySelector('[onclick*=registration]'))">+ Register Patient</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ══════════ DASHBOARD ══════════ -->
+    <div class="page active" id="page-dashboard">
+      
+      <div style="background:linear-gradient(135deg,rgba(0,212,170,0.1),rgba(0,153,255,0.08));border:1px solid rgba(0,212,170,0.2);border-radius:14px;padding:20px 24px;margin-bottom:24px">
+        <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:8px">👋 Welcome to ClearCare Kenya!</h2>
+        <p style="color:var(--text2);font-size:14px;margin-bottom:12px">Here's how you can use this system:</p>
+        <div style="display:flex;flex-wrap:wrap;gap:16px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="background:var(--accent);color:#001a14;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">1</span>
+            <span style="font-size:13px;color:var(--text2)">Register new patients</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="background:var(--accent);color:#001a14;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">2</span>
+            <span style="font-size:13px;color:var(--text2)">Check insurance coverage</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="background:var(--accent);color:#001a14;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">3</span>
+            <span style="font-size:13px;color:var(--text2)">Get insurance approval</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="background:var(--accent);color:#001a14;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">4</span>
+            <span style="font-size:13px;color:var(--text2)">Refer to specialists</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">Patients Today</div>
+          <div class="stat-value">142</div>
+          <div class="stat-delta up">↑ 12% vs yesterday</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Pre-Auth Pending</div>
+          <div class="stat-value">38</div>
+          <div class="stat-delta down">↑ 4 urgent</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-label">Avg Wait Time</div>
+          <div class="stat-value">18m</div>
+          <div class="stat-delta up">↓ 6m from last week</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">Claims Processed</div>
+          <div class="stat-value">94%</div>
+          <div class="stat-delta up">↑ 2.1% this month</div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <div class="quick-action" onclick="navigate('registration', document.querySelector('[onclick*=registration]'))">
+          <div class="qa-icon">📝</div>
+          <div class="qa-label">Register Patient</div>
+        </div>
+        <div class="quick-action" onclick="navigate('coverage', document.querySelector('[onclick*=coverage]'))">
+          <div class="qa-icon">✅</div>
+          <div class="qa-label">Check Insurance</div>
+        </div>
+        <div class="quick-action" onclick="navigate('preauth', document.querySelector('[onclick*=preauth]'))">
+          <div class="qa-icon">📋</div>
+          <div class="qa-label">Request Approval</div>
+        </div>
+        <div class="quick-action" onclick="navigate('referrals', document.querySelector('[onclick*=referrals]'))">
+          <div class="qa-icon">🔄</div>
+          <div class="qa-label">Send Referral</div>
+        </div>
+        <div class="quick-action" onclick="navigate('providers', document.querySelector('[onclick*=providers]'))">
+          <div class="qa-icon">🏥</div>
+          <div class="qa-label">Find Hospital</div>
+        </div>
+        <div class="quick-action" onclick="navigate('ai', document.querySelector('[onclick*=ai]'))">
+          <div class="qa-icon">💬</div>
+          <div class="qa-label">Ask Questions</div>
+        </div>
+      </div>
+
+      <div class="grid-65-35">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📋 Recent Patient Activity</div>
+            <button class="btn btn-ghost btn-sm">View All</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Provider</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sarah M.</strong><br><span style="font-size:11px;color:var(--text3)">ID: #P-4821</span></td>
+                <td><span class="badge badge-blue">Pre-Auth</span></td>
+                <td><span class="badge badge-yellow">⏳ Pending</span></td>
+                <td>Jubilee Insurance</td>
+                <td><button class="btn btn-secondary btn-sm">Review</button></td>
+              </tr>
+              <tr>
+                <td><strong>James K.</strong><br><span style="font-size:11px;color:var(--text3)">ID: #P-4820</span></td>
+                <td><span class="badge badge-purple">Referral</span></td>
+                <td><span class="badge badge-green">✓ Approved</span></td>
+                <td>NHIF</td>
+                <td><button class="btn btn-secondary btn-sm">View</button></td>
+              </tr>
+              <tr>
+                <td><strong>Amira H.</strong><br><span style="font-size:11px;color:var(--text3)">ID: #P-4819</span></td>
+                <td><span class="badge badge-gray">Registration</span></td>
+                <td><span class="badge badge-green">✓ Complete</span></td>
+                <td>AAR Healthcare</td>
+                <td><button class="btn btn-secondary btn-sm">View</button></td>
+              </tr>
+              <tr>
+                <td><strong>Tom L.</strong><br><span style="font-size:11px;color:var(--text3)">ID: #P-4818</span></td>
+                <td><span class="badge badge-red">Pre-Auth</span></td>
+                <td><span class="badge badge-red">✗ Denied</span></td>
+                <td>Madison Insurance</td>
+                <td><button class="btn btn-warn btn-sm">Appeal</button></td>
+              </tr>
+              <tr>
+                <td><strong>Linda P.</strong><br><span style="font-size:11px;color:var(--text3)">ID: #P-4817</span></td>
+                <td><span class="badge badge-blue">Coverage</span></td>
+                <td><span class="badge badge-yellow">⏳ Verifying</span></td>
+                <td>Britam Insurance</td>
+                <td><button class="btn btn-secondary btn-sm">Track</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Pre-Auth Breakdown</div>
+            </div>
+            <div class="panel-body">
+              <div class="donut-wrap">
+                <svg width="90" height="90" viewBox="0 0 90 90">
+                  <circle cx="45" cy="45" r="35" fill="none" stroke="var(--border)" stroke-width="12"/>
+                  <circle cx="45" cy="45" r="35" fill="none" stroke="var(--success)" stroke-width="12" stroke-dasharray="131 88" stroke-dashoffset="0" transform="rotate(-90 45 45)"/>
+                  <circle cx="45" cy="45" r="35" fill="none" stroke="var(--warn)" stroke-width="12" stroke-dasharray="62 157" stroke-dashoffset="-131" transform="rotate(-90 45 45)"/>
+                  <circle cx="45" cy="45" r="35" fill="none" stroke="var(--danger)" stroke-width="12" stroke-dasharray="26 193" stroke-dashoffset="-193" transform="rotate(-90 45 45)"/>
+                  <text x="45" y="49" text-anchor="middle" font-size="14" font-weight="700" fill="var(--text)" font-family="DM Serif Display">94</text>
+                </svg>
+                <div class="donut-legend">
+                  <div class="donut-item"><div class="donut-dot" style="background:var(--success)"></div> Approved <strong style="margin-left:auto">59</strong></div>
+                  <div class="donut-item"><div class="donut-dot" style="background:var(--warn)"></div> Pending <strong style="margin-left:auto">28</strong></div>
+                  <div class="donut-item"><div class="donut-dot" style="background:var(--danger)"></div> Denied <strong style="margin-left:auto">7</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Avg Resolution Time</div>
+            </div>
+            <div class="panel-body" style="display:flex;flex-direction:column;gap:12px;">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+                  <span>Pre-Authorization</span><span style="color:var(--warn)">2.4 days</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill warn" style="width:48%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+                  <span>Referral Processing</span><span style="color:var(--success)">1.1 days</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:22%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+                  <span>Claim Settlement</span><span style="color:var(--accent2)">8.2 days</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill blue" style="width:82%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ COVERAGE CHECKER ══════════ -->
+    <div class="page" id="page-coverage">
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">✅ Check Patient Insurance</div>
+          </div>
+          <div class="panel-body">
+            <div style="background:rgba(0,212,170,0.08);border:1px solid rgba(0,212,170,0.15);border-radius:10px;padding:14px 16px;margin-bottom:18px">
+              <div style="font-size:14px;font-weight:600;color:var(--accent);margin-bottom:6px">💡 How to check insurance</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">
+                1. Enter the patient's name or ID number<br>
+                2. Select their insurance company (e.g., NHIF, Jubilee)<br>
+                3. Enter their member/insurance card number<br>
+                4. Select the service they need<br>
+                5. Click "Verify" to see what is covered
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Patient Name or ID</label>
+              <input class="form-input" id="covPatient" placeholder="e.g. John Kamau" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Insurance Company</label>
+                <select class="form-select" id="covProvider">
+                  <option>NHIF</option>
+                  <option>Jubilee Insurance</option>
+                  <option>AAR Healthcare</option>
+                  <option>Madison Insurance</option>
+                  <option>Britam Insurance</option>
+                  <option>ICEA Lion</option>
+                  <option>Corporate Insurance</option>
+                  <option>Sanlam Kenya</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Card/Member Number</label>
+                <input class="form-input" id="covMember" placeholder="e.g. JBL-2024-48291" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">What service does the patient need?</label>
+              <select class="form-select" id="covService">
+                <option>General Consultation (Doctor Visit)</option>
+                <option>Specialist Visit (See a Specialist)</option>
+                <option>Lab Tests (Blood/Urine Tests)</option>
+                <option>Imaging (MRI/CT/X-Ray/Ultrasound)</option>
+                <option>Surgery (Operation)</option>
+                <option>Mental Health (Counselling/Therapy)</option>
+                <option>Physiotherapy (Rehabilitation)</option>
+                <option>Medicine (Prescription Drugs)</option>
+                <option>Emergency (Accident/Emergency)</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="checkCoverage()">🔍 Check Coverage</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📋 Insurance Result</div>
+            <span id="covBadge"></span>
+          </div>
+          <div class="panel-body" id="covResults">
+            <div class="empty-state">
+              <div class="icon">📋</div>
+              <p>Enter patient details and click<br>"Check Coverage" to see results</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel section-gap" style="margin-top:20px">
+        <div class="panel-header">
+          <div class="panel-title">📋 Active Patient Coverage</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Patient</th><th>Provider</th><th>Plan Type</th><th>Deductible Met</th><th>Co-pay</th><th>Network</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Sarah M.</strong></td><td>Jubilee Insurance</td><td>Premium Plus</td>
+              <td>
+                <div>KSh 45,000 / KSh 80,000</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:56%"></div></div>
+              </td>
+              <td>KSh 1,500</td>
+              <td><span class="badge badge-green">In-Network</span></td>
+              <td><span class="badge badge-green">Active</span></td>
+            </tr>
+            <tr>
+              <td><strong>James K.</strong></td><td>NHIF</td><td>SUpsidized</td>
+              <td>
+                <div>KSh 12,000 / KSh 150,000</div>
+                <div class="progress-bar"><div class="progress-fill warn" style="width:8%"></div></div>
+              </td>
+              <td>KSh 500</td>
+              <td><span class="badge badge-yellow">Contracted</span></td>
+              <td><span class="badge badge-green">Active</span></td>
+            </tr>
+            <tr>
+              <td><strong>Tom L.</strong></td><td>Madison Insurance</td><td>Essential Cover</td>
+              <td>
+                <div>KSh 60,000 / KSh 60,000</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+              </td>
+              <td>KSh 0</td>
+              <td><span class="badge badge-green">In-Network</span></td>
+              <td><span class="badge badge-yellow">Pending Renewal</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════ SMART REGISTRATION ══════════ -->
+    <div class="page" id="page-registration">
+      <div class="grid-65-35">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📝 Register New Patient</div>
+          </div>
+          <div class="panel-body">
+            <div class="step-indicator">
+              <div class="step done" id="step1"><div class="step-num">✓</div> Personal Info</div>
+              <div class="step-line"></div>
+              <div class="step active" id="step2"><div class="step-num">2</div> Insurance</div>
+              <div class="step-line"></div>
+              <div class="step" id="step3"><div class="step-num">3</div> Medical Info</div>
+              <div class="step-line"></div>
+              <div class="step" id="step4"><div class="step-num">4</div> Confirm</div>
+            </div>
+
+            <div id="regStep1" style="display:none">
+              <div style="background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.15);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text2)">
+                📋 Fill in the patient's basic information below
+              </div>
+              <div class="two-col-form">
+                <div class="form-group"><label class="form-label">First Name</label><input class="form-input" placeholder="e.g. John" /></div>
+                <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" placeholder="e.g. Kamau" /></div>
+                <div class="form-group"><label class="form-label">Date of Birth</label><input class="form-input" type="date" /></div>
+                <div class="form-group"><label class="form-label">Gender</label><select class="form-select"><option>Male</option><option>Female</option><option>Other</option></select></div>
+                <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" placeholder="e.g. 0712 345 678" /></div>
+                <div class="form-group"><label class="form-label">Email (optional)</label><input class="form-input" placeholder="e.g. john@email.co.ke" /></div>
+              </div>
+              <div class="form-group"><label class="form-label">Home Address</label><input class="form-input" placeholder="e.g. 123 Kenyatta Road, Nairobi" /></div>
+              <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="nextRegStep(2)">Next Step →</button>
+            </div>
+
+            <div id="regStep2">
+              <div style="background:rgba(0,153,255,0.06);border:1px solid rgba(0,153,255,0.15);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text2)">
+                🏥 Enter the patient's insurance details. The system will automatically verify their coverage!
+              </div>
+              <div class="two-col-form">
+                <div class="form-group"><label class="form-label">Insurance Company</label>
+                  <select class="form-select" onchange="autoVerify()">
+                    <option>Select... (Select Insurance)</option>
+                    <option>NHIF</option>
+                    <option>Jubilee Insurance</option>
+                    <option>AAR Healthcare</option>
+                    <option>Madison Insurance</option>
+                    <option>Britam Insurance</option>
+                    <option>ICEA Lion</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Insurance Card Number</label><input class="form-input" placeholder="e.g. JBL-2024-48291" oninput="autoVerify()" /></div>
+                <div class="form-group"><label class="form-label">Employer/Scheme Name</label><input class="form-input" placeholder="e.g. Safaricom Ltd" /></div>
+                <div class="form-group"><label class="form-label">Plan Type (Auto-detected)</label><input class="form-input" id="planTypeAuto" placeholder="Will show after entering card number" readonly style="opacity:.7" /></div>
+              </div>
+              <div id="autoVerifyResult"></div>
+              <div style="display:flex;gap:10px;margin-top:12px">
+                <button class="btn btn-secondary" onclick="nextRegStep(1)">← Previous</button>
+                <button class="btn btn-primary" style="flex:1" onclick="nextRegStep(3)">Next Step →</button>
+              </div>
+            </div>
+
+            <div id="regStep3" style="display:none">
+              <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text2)">
+                🏨 Tell us why the patient is visiting and any health conditions we should know about
+              </div>
+              <div class="form-group"><label class="form-label">Why is the patient visiting today?</label>
+                <textarea class="form-textarea" placeholder="e.g. Headache and fever for 2 days"></textarea>
+              </div>
+              <div class="two-col-form">
+                <div class="form-group"><label class="form-label">Known Allergies</label><input class="form-input" placeholder="e.g. Penicillin (Leave empty if none)" /></div>
+                <div class="form-group"><label class="form-label">Current Medications</label><input class="form-input" placeholder="e.g. Amlodipine 5mg (Leave empty if none)" /></div>
+              </div>
+              <div class="form-group"><label class="form-label">Any of these conditions apply? (Click to select)</label>
+                <div class="chip-row">
+                  <div class="chip" onclick="this.classList.toggle('active')">Diabetes</div>
+                  <div class="chip" onclick="this.classList.toggle('active')">High Blood Pressure</div>
+                  <div class="chip" onclick="this.classList.toggle('active')">Heart Problem</div>
+                  <div class="chip" onclick="this.classList.toggle('active')">Asthma</div>
+                  <div class="chip" onclick="this.classList.toggle('active')">Arthritis</div>
+                  <div class="chip" onclick="this.classList.toggle('active')">Cancer (past or present)</div>
+                  <div class="chip" onclick="this.classList.toggle('active')">None of these</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:12px">
+                <button class="btn btn-secondary" onclick="nextRegStep(2)">← Previous</button>
+                <button class="btn btn-primary" style="flex:1" onclick="nextRegStep(4)">Review Details →</button>
+              </div>
+            </div>
+
+            <div id="regStep4" style="display:none">
+              <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text2)">
+                ✅ Please review the information below and confirm it's correct
+              </div>
+              <div class="coverage-result">
+                <div class="coverage-item"><span class="cov-icon">👤</span><span class="cov-label">Patient Name</span><span class="cov-value">John Kamau · Born: Apr 12, 1988</span></div>
+                <div class="coverage-item"><span class="cov-icon">🏥</span><span class="cov-label">Insurance</span><span class="cov-value">Jubilee Insurance · Premium Plus</span></div>
+                <div class="coverage-item"><span class="cov-icon">💳</span><span class="cov-label">Card Number</span><span class="cov-value">JBL-2024-48291</span></div>
+                <div class="coverage-item"><span class="cov-icon">💰</span><span class="cov-label">Co-pay Amount</span><span class="cov-value">KSh 1,500</span></div>
+                <div class="coverage-item"><span class="cov-icon">✅</span><span class="cov-label">Need Insurance Approval First?</span><span class="cov-value" style="color:var(--success)">No — Can see doctor directly</span></div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:16px">
+                <button class="btn btn-secondary" onclick="nextRegStep(3)">← Go Back</button>
+                <button class="btn btn-primary" style="flex:1" onclick="completeRegistration()">✓ Complete Registration</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">⏱ Queue Estimate</div></div>
+            <div class="panel-body" style="text-align:center">
+              <div style="font-size:48px;font-family:'DM Serif Display',serif;color:var(--accent)">18</div>
+              <div style="font-size:13px;color:var(--text3)">minutes estimated wait</div>
+              <div class="divider"></div>
+              <div style="font-size:12px;color:var(--text2)">Based on current patient load<br>and insurance verification status</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">🤖 AI Check</div></div>
+            <div class="panel-body" style="font-size:13px;color:var(--text2);line-height:1.6">
+              Based on the plan type and complaint, this visit likely <strong style="color:var(--success)">does not require pre-authorization</strong>. Direct-access specialist referral may be needed if labs flag abnormalities.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PRE-AUTHORIZATION ══════════ -->
+    <div class="page" id="page-preauth">
+      
+      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:14px 16px;margin-bottom:20px">
+        <div style="font-size:14px;font-weight:600;color:var(--warn);margin-bottom:6px">💡 What is Insurance Approval?</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6">
+          Some medical procedures (like MRI, surgery, or special treatments) need approval from the insurance company before they can be done. 
+          This page shows all approval requests and their status.
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showModal('preauthModal')">+ New Approval Request</button>
+        <button class="btn btn-secondary">⬇ Export List</button>
+        <div style="flex:1;min-width:200px">
+          <input class="form-input" placeholder="🔍 Search by patient name or ID..." />
+        </div>
+        <select class="form-select" style="width:auto">
+          <option>All Requests</option>
+          <option>Pending (Waiting)</option>
+          <option>Approved (Ready)</option>
+          <option>Denied (Rejected)</option>
+          <option>Urgent (Needs Attention)</option>
+        </select>
+      </div>
+
+      <div class="grid-2 section-gap">
+        <div class="mini-kpi"><div class="mini-kpi-label">Average Approval Time</div><div class="mini-kpi-val" style="color:var(--warn)">2.4 days</div></div>
+        <div class="mini-kpi"><div class="mini-kpi-label">Auto-Approved Today</div><div class="mini-kpi-val" style="color:var(--success)">34%</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">📋 Insurance Approval Requests</div></div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Patient</th><th>Procedure</th><th>Provider</th><th>Submitted</th><th>Status</th><th>Priority</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag">PA-2041</span></td>
+              <td><strong>Sarah M.</strong></td>
+              <td>MRI Brain</td>
+              <td>Jubilee Insurance</td>
+              <td>Today 9:14am</td>
+              <td><span class="badge badge-yellow">⏳ Pending</span></td>
+              <td><span class="badge badge-red">🔴 Urgent</span></td>
+              <td><button class="btn btn-secondary btn-sm" onclick="showModal('trackModal')">Track</button></td>
+            </tr>
+            <tr>
+              <td><span class="tag">PA-2040</span></td>
+              <td><strong>Linda P.</strong></td>
+              <td>Knee Replacement</td>
+              <td>NHIF</td>
+              <td>Yesterday</td>
+              <td><span class="badge badge-yellow">⏳ Pending</span></td>
+              <td><span class="badge badge-yellow">🟡 High</span></td>
+              <td><button class="btn btn-secondary btn-sm" onclick="showModal('trackModal')">Track</button></td>
+            </tr>
+            <tr>
+              <td><span class="tag">PA-2039</span></td>
+              <td><strong>Robert N.</strong></td>
+              <td>Cardiac Cath</td>
+              <td>Madison Insurance</td>
+              <td>2 days ago</td>
+              <td><span class="badge badge-green">✓ Approved</span></td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
+            </tr>
+            <tr>
+              <td><span class="tag">PA-2038</span></td>
+              <td><strong>Tom L.</strong></td>
+              <td>Bariatric Surgery</td>
+              <td>Britam Insurance</td>
+              <td>3 days ago</td>
+              <td><span class="badge badge-red">✗ Denied</span></td>
+              <td><span class="badge badge-red">🔴 Urgent</span></td>
+              <td><button class="btn btn-danger btn-sm">Appeal</button></td>
+            </tr>
+            <tr>
+              <td><span class="tag">PA-2037</span></td>
+              <td><strong>Amira H.</strong></td>
+              <td>Physical Therapy (12 sessions)</td>
+              <td>AAR Healthcare</td>
+              <td>4 days ago</td>
+              <td><span class="badge badge-green">✓ Approved</span></td>
+              <td><span class="badge badge-gray">Normal</span></td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════ REFERRALS ══════════ -->
+    <div class="page" id="page-referrals">
+      
+      <div style="background:rgba(0,153,255,0.08);border:1px solid rgba(0,153,255,0.2);border-radius:10px;padding:14px 16px;margin-bottom:20px">
+        <div style="font-size:14px;font-weight:600;color:var(--accent2);margin-bottom:6px">💡 What is a Referral?</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6">
+          A referral is when you need to send a patient to see a specialist doctor (like a heart doctor or brain doctor). 
+          Some insurance plans require a referral before covering specialist visits.
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showModal('referralModal')">+ Create New Referral</button>
+        <button class="btn btn-secondary">🔍 Find Specialist Doctor</button>
+        <div style="flex:1;min-width:200px"><input class="form-input" placeholder="🔍 Search by patient name..." /></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">🔄 Patient Referrals</div></div>
+        <table>
+          <thead>
+            <tr><th>Ref ID</th><th>Patient</th><th>From (PCP)</th><th>To (Specialist)</th><th>Reason</th><th>Status</th><th>Est. Appt</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag">REF-891</span></td>
+              <td><strong>James K.</strong></td>
+              <td>Dr. Ochieng</td>
+              <td>Cardiologist</td>
+              <td>Chest pains</td>
+              <td><span class="badge badge-green">✓ Approved</span></td>
+              <td>Mar 28</td>
+              <td><button class="btn btn-secondary btn-sm">Schedule</button></td>
+            </tr>
+            <tr>
+              <td><span class="tag">REF-890</span></td>
+              <td><strong>Faith W.</strong></td>
+              <td>Dr. Wanjiku</td>
+              <td>Orthopedic</td>
+              <td>Knee injury</td>
+              <td><span class="badge badge-yellow">⏳ Pending</span></td>
+              <td>TBD</td>
+              <td><button class="btn btn-secondary btn-sm">Track</button></td>
+            </tr>
+            <tr>
+              <td><span class="tag">REF-889</span></td>
+              <td><strong>Peter M.</strong></td>
+              <td>Dr. Kiprop</td>
+              <td>Neurologist</td>
+              <td>Migraines</td>
+              <td><span class="badge badge-blue">→ In Transit</span></td>
+              <td>Apr 2</td>
+              <td><button class="btn btn-secondary btn-sm">View</button></td>
+            </tr>
+            <tr>
+              <td><span class="tag">REF-888</span></td>
+              <td><strong>Mary A.</strong></td>
+              <td>Dr. Otieno</td>
+              <td>Endocrinologist</td>
+              <td>Diabetes management</td>
+              <td><span class="badge badge-red">✗ Rejected</span></td>
+              <td>—</td>
+              <td><button class="btn btn-danger btn-sm">Resubmit</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════ NETWORK FINDER ══════════ -->
+    <div class="page" id="page-providers">
+      <div class="grid-65-35">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">🏥 Find a Hospital or Specialist</div></div>
+          <div class="panel-body">
+            
+            <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text2)">
+              🏥 Use this tool to find hospitals and doctors that accept the patient's insurance. In-network providers cost less!
+            </div>
+
+            <div class="form-row" style="margin-bottom:14px">
+              <div class="form-group">
+                <label class="form-label">Insurance Plan</label>
+                <select class="form-select">
+                  <option>NHIF (All Plans)</option>
+                  <option>Jubilee Premium Plus</option>
+                  <option>AAR Comprehensive</option>
+                  <option>Madison Essential Cover</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Specialty</label>
+                <select class="form-select">
+                  <option>All Specialties</option>
+                  <option>Cardiologist</option>
+                  <option>Neurologist</option>
+                  <option>Orthopedic</option>
+                  <option>Dermatologist</option>
+                  <option>Oncologist</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label">Location / Town</label>
+              <input class="form-input" placeholder="Enter town or area name…" />
+            </div>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:16px" onclick="showToast('Searching network…', 'success')">Search Network</button>
+
+            <div style="font-size:12px;color:var(--text3);margin-bottom:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase">Results (6 providers)</div>
+            <div id="providerList">
+              <!-- provider cards -->
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">📊 Network Statistics</div></div>
+            <div class="panel-body" style="display:flex;flex-direction:column;gap:10px">
+              <div class="mini-kpi"><div class="mini-kpi-label">In-Network Providers</div><div class="mini-kpi-val" style="color:var(--success)">1,240</div></div>
+              <div class="mini-kpi"><div class="mini-kpi-label">Avg Distance</div><div class="mini-kpi-val">3.2 km</div></div>
+              <div class="mini-kpi"><div class="mini-kpi-label">Accepting New Patients</div><div class="mini-kpi-val" style="color:var(--accent)">87%</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Out-of-Network Warning</div></div>
+            <div class="panel-body">
+              <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:12px;font-size:13px;color:var(--text2)">
+                ⚠️ Seeing an out-of-network provider could result in <strong style="color:var(--danger)">40–80% higher costs</strong>. Always verify network status before scheduling.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SMART QUEUE ══════════ -->
+    <div class="page" id="page-queue">
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card green">
+          <div class="stat-label">Currently Waiting</div>
+          <div class="stat-value">12</div>
+          <div class="stat-delta neutral">3 need insurance check</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">In Consultation</div>
+          <div class="stat-value">6</div>
+          <div class="stat-delta neutral">4 docs active</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-label">Avg Wait Today</div>
+          <div class="stat-value">18m</div>
+          <div class="stat-delta up">↓ 6m vs yesterday</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">📊 Current Waiting List</div>
+              <span class="badge badge-green">● Live</span>
+            </div>
+          <table>
+            <thead><tr><th>#</th><th>Patient</th><th>Priority</th><th>Wait</th><th>Status</th></tr></thead>
+            <tbody id="queueTable">
+              <tr><td>1</td><td><strong>Amira W.</strong></td><td><span class="badge badge-red">Urgent</span></td><td>0m</td><td><span class="badge badge-blue">In Consult</span></td></tr>
+              <tr><td>2</td><td><strong>James K.</strong></td><td><span class="badge badge-yellow">High</span></td><td>8m</td><td><span class="badge badge-yellow">Ins. Check</span></td></tr>
+              <tr><td>3</td><td><strong>Linda A.</strong></td><td><span class="badge badge-gray">Normal</span></td><td>14m</td><td><span class="badge badge-gray">Waiting</span></td></tr>
+              <tr><td>4</td><td><strong>Robert M.</strong></td><td><span class="badge badge-gray">Normal</span></td><td>18m</td><td><span class="badge badge-gray">Waiting</span></td></tr>
+              <tr><td>5</td><td><strong>Faith N.</strong></td><td><span class="badge badge-gray">Normal</span></td><td>22m</td><td><span class="badge badge-gray">Waiting</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header"><div class="panel-title">🤖 Smart Queue Order</div></div>
+            <div class="panel-body">
+              <div style="background:rgba(0,153,255,0.06);border:1px solid rgba(0,153,255,0.15);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text2)">
+                💡 The list below shows patients in the order they will be seen. Patients with verified insurance and urgent conditions are prioritized.
+              </div>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-dot done"></div>
+                <div class="timeline-date">9:00am</div>
+                <div class="timeline-text"><strong>Amira H.</strong> — Insurance verified ✓</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot active"></div>
+                <div class="timeline-date">Now</div>
+                <div class="timeline-text"><strong>James K.</strong> — Awaiting NHIF eligibility confirmation</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot pending"></div>
+                <div class="timeline-date">Est. +8m</div>
+                <div class="timeline-text"><strong>Linda P.</strong> — Pre-auth check in progress</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">Est. +18m</div>
+                <div class="timeline-text"><strong>Robert N.</strong> — Queued</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ AI ASSISTANT ══════════ -->
+    <div class="page" id="page-ai">
+      <div class="grid-65-35">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">💬 Need Help? Ask Here!</div>
+            <span class="badge badge-green">● Online</span>
+          </div>
+          <div class="panel-body" style="padding:0">
+            <div class="ai-chat">
+              <div class="ai-messages" id="aiMessages">
+                <div class="msg msg-ai">
+                  <div class="msg-label">ClearCare Assistant</div>
+                  Jambo! 👋 I'm here to help you with anything about insurance. You can ask me things like:<br><br>
+                  • "Does this patient need NHIF approval?"<br>
+                  • "How do I check if a procedure is covered?"<br>
+                  • "What documents do I need for a referral?"<br><br>
+                  Type your question below and I'll help you out!
+                </div>
+              </div>
+              <div class="ai-input-row">
+                <input class="form-input" id="aiInput" placeholder="Ask about coverage, pre-auth, referrals, appeals…" onkeydown="if(event.key==='Enter')sendAI()" style="flex:1" />
+                <button class="btn btn-primary" onclick="sendAI()">Send ↗</button>
+              </div>
+            </div>
+            <div style="padding:16px">
+              <div style="font-size:11px;color:var(--text3);margin-bottom:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase">Common Questions (Click to ask)</div>
+              <div class="chip-row">
+                <div class="chip" onclick="askAI('Does this patient need insurance approval for an MRI scan?')">📋 MRI approval needed?</div>
+                <div class="chip" onclick="askAI('How do I appeal a denied insurance claim?')">❌ Appeal a denial</div>
+                <div class="chip" onclick="askAI('How do I refer a patient to a specialist?')">🔄 Refer to specialist</div>
+                <div class="chip" onclick="askAI('How do I check NHIF coverage?')">✅ Check NHIF coverage</div>
+                <div class="chip" onclick="askAI('How long does insurance approval take?')">⏱️ Approval timeline</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">🤖 What I Can Help With</div></div>
+            <div class="panel-body" style="display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:13px;color:var(--text2);display:flex;gap:8px;align-items:flex-start"><span>✅</span> Check if a procedure is covered</div>
+              <div style="font-size:13px;color:var(--text2);display:flex;gap:8px;align-items:flex-start"><span>✅</span> Explain NHIF benefits</div>
+              <div style="font-size:13px;color:var(--text2);display:flex;gap:8px;align-items:flex-start"><span>✅</span> Guide on insurance approval</div>
+              <div style="font-size:13px;color:var(--text2);display:flex;gap:8px;align-items:flex-start"><span>✅</span> Help with referrals</div>
+              <div style="font-size:13px;color:var(--text2);display:flex;gap:8px;align-items:flex-start"><span>✅</span> Draft appeal letters</div>
+              <div style="font-size:13px;color:var(--text2);display:flex;gap:8px;align-items:flex-start"><span>✅</span> Find hospitals & doctors</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">📋 Recent Questions</div></div>
+            <div class="panel-body" style="display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:12px;color:var(--text2);padding:6px 0;border-bottom:1px solid var(--border)">Explained deductible to patient #P-4820</div>
+              <div style="font-size:12px;color:var(--text2);padding:6px 0;border-bottom:1px solid var(--border)">Drafted appeal for PA-2038 denial</div>
+              <div style="font-size:12px;color:var(--text2);padding:6px 0">Confirmed in-network orthopedic for BlueCross</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ ANALYTICS ══════════ -->
+    <div class="page" id="page-analytics">
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-label">Total Claims</div><div class="stat-value">2,841</div><div class="stat-delta up">↑ 8.4% MoM</div></div>
+        <div class="stat-card blue"><div class="stat-label">Approval Rate</div><div class="stat-value">91%</div><div class="stat-delta up">↑ 3.1%</div></div>
+        <div class="stat-card warn"><div class="stat-label">Avg Process Time</div><div class="stat-value">1.8d</div><div class="stat-delta up">↓ 0.4d</div></div>
+        <div class="stat-card purple"><div class="stat-label">Patient Satisfaction</div><div class="stat-value">4.7★</div><div class="stat-delta up">↑ 0.3</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Pre-Auth Volume — Last 30 Days</div></div>
+          <div class="panel-body">
+            <svg width="100%" height="160" viewBox="0 0 400 160">
+              <polyline points="10,130 50,110 90,100 130,115 170,85 210,70 250,80 290,55 330,45 370,30" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="10,130 50,110 90,100 130,115 170,85 210,70 250,80 290,55 330,45 370,30 370,155 10,155" fill="url(#grad1)" opacity="0.2"/>
+              <defs>
+                <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--accent)"/>
+                  <stop offset="100%" stop-color="transparent"/>
+                </linearGradient>
+              </defs>
+              <line x1="10" y1="155" x2="380" y2="155" stroke="var(--border)" stroke-width="1"/>
+            </svg>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Claims by Insurance Provider</div></div>
+          <div class="panel-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>NHIF</span><span>842</span></div><div class="progress-bar"><div class="progress-fill" style="width:82%"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Jubilee Insurance</span><span>621</span></div><div class="progress-bar"><div class="progress-fill blue" style="width:61%"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>AAR Healthcare</span><span>480</span></div><div class="progress-bar"><div class="progress-fill" style="width:47%;background:var(--accent3)"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Madison Insurance</span><span>398</span></div><div class="progress-bar"><div class="progress-fill warn" style="width:39%"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Britam Insurance</span><span>500</span></div><div class="progress-bar"><div class="progress-fill" style="width:49%;background:var(--success)"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ SETTINGS ══════════ -->
+    <div class="page" id="page-settings">
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">⚙ General Settings</div></div>
+          <div class="panel-body">
+            <div class="form-group"><label class="form-label">Platform Name</label><input class="form-input" value="ClearCare Kenya" /></div>
+            <div class="form-group"><label class="form-label">Default Currency</label><select class="form-select"><option selected>KES (KSh)</option><option>USD ($)</option><option>EUR (€)</option><option>GBP (£)</option></select></div>
+            <div class="form-group"><label class="form-label">Timezone</label><select class="form-select"><option selected>Africa/Nairobi (EAT)</option><option>America/New_York (EST)</option><option>Europe/London (GMT)</option></select></div>
+            <div class="form-group"><label class="form-label">Language</label><select class="form-select"><option selected>English</option><option>Swahili (Kiswahili)</option><option>French</option><option>Arabic</option></select></div>
+            <button class="btn btn-primary" onclick="showToast('Settings saved!', 'success')">Save Settings</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">🔗 Insurance API Integrations</div></div>
+          <div class="panel-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+                <div><div style="font-size:13px;font-weight:600">NHIF i-courtesy API</div><div style="font-size:11px;color:var(--text3)">Real-time eligibility & claims</div></div>
+                <span class="badge badge-green">● Connected</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+                <div><div style="font-size:13px;font-weight:600">Jubilee Insurance API</div><div style="font-size:11px;color:var(--text3)">Claims & benefits</div></div>
+                <span class="badge badge-green">● Connected</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+                <div><div style="font-size:13px;font-weight:600">AAR Healthcare API</div><div style="font-size:11px;color:var(--text3)">Pre-auth gateway</div></div>
+                <span class="badge badge-yellow">⚠ Degraded</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+                <div><div style="font-size:13px;font-weight:600">Madison Insurance API</div><div style="font-size:11px;color:var(--text3)">Network verification</div></div>
+                <span class="badge badge-red">✗ Disconnected</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ TENANT MANAGEMENT ══════════ -->
+    <div class="page" id="page-tenants">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div>
+          <h2 style="font-family:'DM Serif Display',serif;font-size:22px">Tenant Management</h2>
+          <p style="color:var(--text3);font-size:13px;margin-top:4px">License ClearCare to insurance providers, hospitals, and health systems</p>
+        </div>
+        <button class="btn btn-primary" onclick="showModal('newTenantModal')">+ Add Tenant</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-label">Active Tenants</div><div class="stat-value">4</div></div>
+        <div class="stat-card blue"><div class="stat-label">Monthly Revenue</div><div class="stat-value">KSh 5.2M</div></div>
+        <div class="stat-card warn"><div class="stat-label">Total Patients</div><div class="stat-value">124k</div></div>
+        <div class="stat-card purple"><div class="stat-label">API Calls / Mo</div><div class="stat-value">2.1M</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">Licensed Tenants</div></div>
+        <table>
+          <thead><tr><th>Organization</th><th>Plan</th><th>Users</th><th>Monthly Fee</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>MediShield Pro</strong><br><span style="font-size:11px;color:var(--text3)">Hospital chain · 12 facilities</span></td>
+              <td><span class="badge badge-purple">Enterprise</span></td>
+              <td>240</td>
+              <td>KSh 1,980,000</td>
+              <td>Jan 2024</td>
+              <td><span class="badge badge-green">Active</span></td>
+              <td><button class="btn btn-secondary btn-sm">Manage</button></td>
+            </tr>
+            <tr>
+              <td><strong> Nairobi West Medical Centre</strong><br><span style="font-size:11px;color:var(--text3)">Hospital chain · 8 facilities</span></td>
+              <td><span class="badge badge-blue">Professional</span></td>
+              <td>86</td>
+              <td>KSh 950,000</td>
+              <td>Mar 2024</td>
+              <td><span class="badge badge-green">Active</span></td>
+              <td><button class="btn btn-secondary btn-sm">Manage</button></td>
+            </tr>
+            <tr>
+              <td><strong>Kenya Airways Health</strong><br><span style="font-size:11px;color:var(--text3)">Corporate health · national</span></td>
+              <td><span class="badge badge-purple">Enterprise</span></td>
+              <td>410</td>
+              <td>KSh 2,200,000</td>
+              <td>Nov 2023</td>
+              <td><span class="badge badge-green">Active</span></td>
+              <td><button class="btn btn-secondary btn-sm">Manage</button></td>
+            </tr>
+            <tr>
+              <td><strong>Kisumu County Hospital</strong><br><span style="font-size:11px;color:var(--text3)">Public hospital</span></td>
+              <td><span class="badge badge-gray">Starter</span></td>
+              <td>24</td>
+              <td>KSh 240,000</td>
+              <td>Feb 2025</td>
+              <td><span class="badge badge-yellow">Trial</span></td>
+              <td><button class="btn btn-secondary btn-sm">Upgrade</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel" style="margin-top:20px">
+        <div class="panel-header"><div class="panel-title">Pricing Tiers</div></div>
+        <div class="panel-body">
+          <div class="grid-3">
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:20px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:8px">Starter</div>
+              <div style="font-size:28px;font-family:'DM Serif Display',serif">KSh 240,000<span style="font-size:14px;color:var(--text3)">/mo</span></div>
+              <div class="divider"></div>
+              <div style="font-size:13px;color:var(--text2);line-height:2">✓ Up to 30 users<br>✓ NHIF + 2 private integrations<br>✓ Basic AI assistant<br>✓ Email support</div>
+            </div>
+            <div style="background:rgba(0,153,255,0.05);border:1px solid var(--accent2);border-radius:12px;padding:20px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:2px;color:var(--accent2);text-transform:uppercase;margin-bottom:8px">Professional</div>
+              <div style="font-size:28px;font-family:'DM Serif Display',serif">KSh 950,000<span style="font-size:14px;color:var(--text3)">/mo</span></div>
+              <div class="divider"></div>
+              <div style="font-size:13px;color:var(--text2);line-height:2">✓ Up to 150 users<br>✓ Unlimited integrations<br>✓ Advanced AI + appeals<br>✓ Priority support</div>
+            </div>
+            <div style="background:rgba(0,212,170,0.05);border:1px solid var(--accent);border-radius:12px;padding:20px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:8px">Enterprise</div>
+              <div style="font-size:28px;font-family:'DM Serif Display',serif">Custom</div>
+              <div class="divider"></div>
+              <div style="font-size:13px;color:var(--text2);line-height:2">✓ Unlimited users<br>✓ White-label branding<br>✓ Dedicated infra<br>✓ SLA + 24/7 support</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- Pre-Auth Modal -->
+<div class="modal-overlay" id="preauthModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:22px">📋</span>
+      <div class="modal-title">Request Insurance Approval</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('preauthModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text2)">
+        📝 Fill in the details below to request insurance approval for a medical procedure
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Patient Name or ID</label><input class="form-input" placeholder="e.g. Sarah M." /></div>
+        <div class="form-group"><label class="form-label">Insurance Company</label><select class="form-select"><option>NHIF</option><option>Jubilee Insurance</option><option>AAR Healthcare</option><option>Madison Insurance</option><option>Britam Insurance</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Procedure/Treatment Needed</label><input class="form-input" placeholder="e.g. MRI Scan, Knee Surgery…" /></div>
+      <div class="form-group"><label class="form-label">Why is this procedure needed? (Brief explanation)</label><textarea class="form-textarea" placeholder="e.g. Patient has persistent headaches for 2 weeks, MRI needed to rule out…"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">How Urgent?</label><select class="form-select"><option>Normal (Can wait 1-2 weeks)</option><option>High (Within 3 days)</option><option>Urgent (Today/Tomorrow)</option></select></div>
+        <div class="form-group"><label class="form-label">Preferred Date</label><input class="form-input" type="date" /></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('preauthModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitPreAuth()">Submit Request →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Referral Modal -->
+<div class="modal-overlay" id="referralModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:22px">🔄</span>
+      <div class="modal-title">Create Patient Referral</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('referralModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:rgba(0,153,255,0.06);border:1px solid rgba(0,153,255,0.15);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text2)">
+        🔄 Fill in the details to refer a patient to a specialist doctor
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Patient Name</label><input class="form-input" placeholder="e.g. James K." /></div>
+        <div class="form-group"><label class="form-label">Referring Doctor</label><input class="form-input" placeholder="e.g. Dr. Ochieng" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Type of Specialist Needed</label><select class="form-select"><option>Heart Doctor (Cardiologist)</option><option>Brain/Nerve Doctor (Neurologist)</option><option>Bone/Joint Doctor (Orthopedic)</option><option>Skin Doctor (Dermatologist)</option><option>Cancer Doctor (Oncologist)</option><option>Hormone Doctor (Endocrinologist)</option></select></div>
+        <div class="form-group"><label class="form-label">Insurance</label><select class="form-select"><option>NHIF</option><option>Jubilee Insurance</option><option>AAR Healthcare</option><option>Madison Insurance</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Reason for Referral</label><textarea class="form-textarea" placeholder="e.g. Patient has chest pains, needs heart evaluation…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('referralModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitReferral()">Submit Referral →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Track Modal -->
+<div class="modal-overlay" id="trackModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:22px">📍</span>
+      <div class="modal-title">Authorization Tracker — PA-2041</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('trackModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <div><span style="font-size:11px;color:var(--text3)">Patient</span><div style="font-size:13px;font-weight:600">Sarah M.</div></div>
+        <div style="margin-left:24px"><span style="font-size:11px;color:var(--text3)">Procedure</span><div style="font-size:13px;font-weight:600">MRI Brain</div></div>
+        <div style="margin-left:24px"><span style="font-size:11px;color:var(--text3)">Insurer</span><div style="font-size:13px;font-weight:600">Jubilee Insurance</div></div>
+        <div style="margin-left:auto"><span class="badge badge-yellow">⏳ Pending</span></div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-date">Today 9:14am</div><div class="timeline-text"><strong>Request Submitted</strong> — All documents attached</div></div>
+        <div class="timeline-item"><div class="timeline-dot done"></div><div class="timeline-date">Today 9:30am</div><div class="timeline-text"><strong>AetnaPlus Received</strong> — Case assigned to reviewer</div></div>
+        <div class="timeline-item"><div class="timeline-dot active"></div><div class="timeline-date">Now</div><div class="timeline-text"><strong>Clinical Review</strong> — Under review by medical director</div></div>
+        <div class="timeline-item"><div class="timeline-dot pending"></div><div class="timeline-date">Est. Tomorrow</div><div class="timeline-text"><strong>Decision Expected</strong></div></div>
+        <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Upon Approval</div><div class="timeline-text"><strong>Schedule Procedure</strong></div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('trackModal')">Close</button>
+      <button class="btn btn-warn">📞 Escalate</button>
+    </div>
+  </div>
+</div>
+
+<!-- Alert Modal -->
+<div class="modal-overlay" id="alertModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:22px">🔔</span>
+      <div class="modal-title">Notifications</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('alertModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:12px;font-size:13px"><strong style="color:var(--danger)">🔴 Urgent</strong> — PA-2041 for Sarah M. requires additional documentation from Jubilee Insurance by 5pm today.</div>
+        <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:12px;font-size:13px"><strong style="color:var(--warn)">⚠ Action Needed</strong> — Tom L. pre-auth denial can be appealed within 14 days (expires Apr 6).</div>
+        <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:12px;font-size:13px"><strong style="color:var(--success)">✓ Approved</strong> — James K. specialist referral approved by NHIF.</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;color:var(--text2)">ℹ️ AAR Healthcare API connection degraded — pre-auth submissions may be delayed.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('alertModal')">Mark All Read</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Tenant Modal -->
+<div class="modal-overlay" id="newTenantModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span style="font-size:22px">🏢</span>
+      <div class="modal-title">Add New Tenant</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('newTenantModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Organization Name</label><input class="form-input" placeholder="e.g. Kenyatta National Hospital" /></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" placeholder="admin@hospital.co.ke" /></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" placeholder="+254 700 000 000" /></div>
+      </div>
+      <div class="form-group"><label class="form-label">Subscription Plan</label>
+        <select class="form-select">
+          <option>Starter — KSh 240,000/mo</option>
+          <option>Professional — KSh 950,000/mo</option>
+          <option>Enterprise — Custom</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Number of Users</label><input class="form-input" type="number" placeholder="e.g. 50" /></div>
+      <div class="form-group"><label class="form-label">White-label Domain (optional)</label><input class="form-input" placeholder="e.g. insurance.yourhospital.co.ke" /></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('newTenantModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addTenant()">Create Tenant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<script>
+// ── NAVIGATION ──
+const pages = {
+  dashboard: 'Home',
+  coverage: 'Check Insurance',
+  registration: 'Register Patient',
+  preauth: 'Insurance Approval',
+  referrals: 'Send Referral',
+  providers: 'Find Hospital',
+  queue: 'Waiting List',
+  ai: 'Ask Help',
+  analytics: 'Reports',
+  settings: 'Settings',
+  tenants: 'Organizations'
+};
+
+function navigate(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('topbarTitle').textContent = pages[page] || page;
+}
+
+// ── CLOCK ──
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clockEl').textContent = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── SIDEBAR TOGGLE (mobile) ──
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+if (window.innerWidth < 768) {
+  document.getElementById('menuBtn').style.display = 'block';
+}
+
+// ── MODAL ──
+function showModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ── TOAST ──
+function showToast(msg, type = 'success') {
+  const icons = { success: '✓', warn: '⚠', error: '✗' };
+  const tc = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]}</span> ${msg}`;
+  tc.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ── COVERAGE CHECKER ──
+function checkCoverage() {
+  const patient = document.getElementById('covPatient').value || 'Patient';
+  const provider = document.getElementById('covProvider').value;
+  const service = document.getElementById('covService').value;
+
+  const data = {
+    'General Consultation': { cop: 'KSh 1,500', deduct: 'KSh 45,000/KSh 80,000', preauth: false, network: true, covered: true, oop: 'KSh 1,500' },
+    'Specialist Visit': { cop: 'KSh 3,000', deduct: 'KSh 45,000/KSh 80,000', preauth: false, network: true, covered: true, oop: 'KSh 3,000' },
+    'Lab Tests': { cop: 'KSh 800', deduct: 'KSh 45,000/KSh 80,000', preauth: false, network: true, covered: true, oop: 'KSh 800' },
+    'Imaging (MRI/CT/X-Ray)': { cop: 'KSh 8,500', deduct: 'KSh 45,000/KSh 80,000', preauth: true, network: true, covered: true, oop: 'KSh 8,500' },
+    'Surgical Procedure': { cop: '20% coinsurance', deduct: 'KSh 45,000/KSh 80,000', preauth: true, network: true, covered: true, oop: 'Up to KSh 150,000' },
+    'Mental Health Services': { cop: 'KSh 2,000', deduct: 'KSh 45,000/KSh 80,000', preauth: false, network: false, covered: true, oop: 'KSh 2,000' },
+    'Physical Therapy': { cop: 'KSh 1,800/session', deduct: 'KSh 45,000/KSh 80,000', preauth: true, network: true, covered: true, oop: 'KSh 1,800' },
+    'Prescription Medications': { cop: 'KSh 200/KSh 1,500', deduct: 'Separate KSh 10,000', preauth: false, network: true, covered: true, oop: 'KSh 200-1,500' },
+    'Emergency Room Visit': { cop: 'KSh 5,000', deduct: 'KSh 45,000/KSh 80,000', preauth: false, network: true, covered: true, oop: 'KSh 5,000' }
+  };
+
+  const d = data[service] || data['General Consultation'];
+
+  document.getElementById('covBadge').innerHTML = '<span class="badge badge-green">✓ Verified</span>';
+  document.getElementById('covResults').innerHTML = `
+    <div class="coverage-result">
+      <div class="coverage-item"><span class="cov-icon">👤</span><span class="cov-label">Patient</span><span class="cov-value">${patient || 'Unknown'}</span></div>
+      <div class="coverage-item"><span class="cov-icon">🏥</span><span class="cov-label">Insurer</span><span class="cov-value">${provider}</span></div>
+      <div class="coverage-item"><span class="cov-icon">🔬</span><span class="cov-label">Service</span><span class="cov-value">${service}</span></div>
+      <div class="coverage-item"><span class="cov-icon">${d.covered ? '✅' : '❌'}</span><span class="cov-label">Covered</span><span class="cov-value" style="color:${d.covered ? 'var(--success)' : 'var(--danger)'}">${d.covered ? 'Yes — Covered' : 'Not Covered'}</span></div>
+      <div class="coverage-item"><span class="cov-icon">💳</span><span class="cov-label">Co-pay</span><span class="cov-value">${d.cop}</span></div>
+      <div class="coverage-item"><span class="cov-icon">📊</span><span class="cov-label">Deductible</span><span class="cov-value">${d.deduct}</span></div>
+      <div class="coverage-item"><span class="cov-icon">🌐</span><span class="cov-label">Network</span><span class="cov-value" style="color:${d.network ? 'var(--success)' : 'var(--warn)'}">${d.network ? 'In-Network' : '⚠ Out-of-Network'}</span></div>
+      <div class="coverage-item"><span class="cov-icon">${d.preauth ? '⏳' : '⚡'}</span><span class="cov-label">Pre-Auth Required</span><span class="cov-value" style="color:${d.preauth ? 'var(--warn)' : 'var(--success)'}">${d.preauth ? 'Yes — Submit Request' : 'No — Direct Access'}</span></div>
+      <div class="coverage-item"><span class="cov-icon">💵</span><span class="cov-label">Est. Out-of-Pocket</span><span class="cov-value" style="color:var(--accent);font-weight:700">${d.oop}</span></div>
+    </div>
+    ${d.preauth ? '<div class="info-box" style="margin-top:12px"><div class="icon">⚡</div><div>This service requires pre-authorization. <strong style="cursor:pointer;color:var(--accent)" onclick="navigate(\'preauth\',document.querySelector(\'[onclick*=preauth]\'))">Submit now →</strong></div></div>' : ''}
+  `;
+  showToast('Coverage verified! See results below.', 'success');
+}
+
+// ── REGISTRATION STEPS ──
+let currentStep = 2;
+function nextRegStep(step) {
+  document.querySelectorAll('[id^=regStep]').forEach(s => s.style.display = 'none');
+  document.getElementById('regStep' + step).style.display = 'block';
+  currentStep = step;
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('step' + i);
+    if (!el) continue;
+    el.classList.remove('active', 'done');
+    if (i < step) el.classList.add('done');
+    else if (i === step) el.classList.add('active');
+  }
+}
+
+function autoVerify() {
+  const plans = { NHIF: 'Supa Cover', 'Jubilee Insurance': 'Premium Plus', 'AAR Healthcare': 'Comprehensive', 'Madison Insurance': 'Essential Cover', 'Britam Insurance': 'Corporate Plus', 'ICEA Lion': 'Executive Plan' };
+  const sel = document.querySelector('#regStep2 .form-select');
+  if (sel && plans[sel.value]) {
+    document.getElementById('planTypeAuto').value = plans[sel.value];
+    document.getElementById('autoVerifyResult').innerHTML = `<div class="info-box" style="margin:8px 0"><div class="icon">✅</div><div>Insurance verified — ${plans[sel.value]} plan, KSh 1,500 co-pay, in-network.</div></div>`;
+  }
+}
+
+function completeRegistration() {
+  showToast('Patient registered successfully! Added to waiting list.', 'success');
+  navigate('queue', document.querySelector('[onclick*=queue]'));
+}
+
+// ── PRE-AUTH SUBMIT ──
+function submitPreAuth() {
+  closeModal('preauthModal');
+  showToast('Approval request submitted! You will be notified when processed.', 'success');
+}
+
+function submitReferral() {
+  closeModal('referralModal');
+  showToast('Referral sent successfully!', 'success');
+}
+
+function addTenant() {
+  closeModal('newTenantModal');
+  showToast('New tenant onboarded successfully!', 'success');
+}
+
+// ── PROVIDER LIST ──
+const providerData = [
+  { name: 'Dr. Alice Wanjiku', spec: 'Cardiologist', dist: '0.8 km', rating: '4.9', avail: 'Tomorrow', net: true },
+  { name: 'Dr. Ben Kiprotich', spec: 'Cardiologist', dist: '2.1 km', rating: '4.7', avail: 'Mar 26', net: true },
+  { name: 'Kenyatta National Hospital', spec: 'Cardiology Dept', dist: '3.4 km', rating: '4.8', avail: 'Mar 27', net: true },
+  { name: 'Dr. Susan Akinyi', spec: 'Cardiologist', dist: '4.2 km', rating: '4.6', avail: 'Mar 28', net: false },
+  { name: 'Dr. James Ochieng', spec: 'Cardiologist', dist: '5.0 km', rating: '4.5', avail: 'Apr 1', net: true },
+  { name: 'Mombasa Heart Center', spec: 'Cardiology Clinic', dist: '6.1 km', rating: '4.9', avail: 'Mar 25', net: true }
+];
+
+window.onload = () => {
+  const list = document.getElementById('providerList');
+  if (!list) return;
+  list.innerHTML = providerData.map(p => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="width:36px;height:36px;border-radius:8px;background:${p.net ? 'rgba(0,212,170,0.15)' : 'rgba(245,158,11,0.15)'};display:flex;align-items:center;justify-content:center;font-size:18px">🏥</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${p.name}</div>
+        <div style="font-size:11px;color:var(--text3)">${p.spec} · ${p.dist}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:var(--warn)">★ ${p.rating}</div>
+        <span class="badge ${p.net ? 'badge-green' : 'badge-yellow'}" style="font-size:10px">${p.net ? 'In-Net' : 'Out-Net'}</span>
+      </div>
+      <button class="btn btn-secondary btn-sm">Book</button>
+    </div>
+  `).join('');
+};
+
+// ── AI ASSISTANT ──
+const aiResponses = {
+  'mri': 'Yes, an **MRI scan usually requires insurance approval** before it can be done. Here\'s what to do:<br><br>1️⃣ Go to the "Insurance Approval" section<br>2️⃣ Click "+ New Approval Request"<br>3️⃣ Enter the patient\'s details and the MRI procedure<br>4️⃣ Submit and wait 1-2 business days<br><br>💡 If it\'s urgent, call the insurance company directly — they can sometimes approve same-day.',
+  'appeal': 'If an insurance claim was denied, here\'s how to appeal:<br><br>📋 Step 1: Get the denial letter from the insurer (they must provide it)<br>📋 Step 2: Ask the doctor to write a letter explaining why the procedure was medically necessary<br>📋 Step 3: Submit the appeal within 30 days<br>📋 Step 4: Wait for the insurance to review (usually 14-30 days)<br><br>Need help writing an appeal letter? Just ask me!',
+  'neurologist': 'To refer a patient to a neurologist (brain/spine specialist):<br><br>🔄 Go to "Send Referral" in the menu<br>🔄 Select the patient and choose "Neurologist" as the specialty<br>🔄 The system will show in-network specialists<br>🔄 Send the referral electronically<br><br>Note: For NHIF, you may need a referral letter from a general doctor first.',
+  'nhif': '**NHIF Coverage Summary:**<br><br>✅ Inpatient (staying in hospital): Up to KSh 500,000<br>✅ Outpatient (doctor visits): KSh 3,000 per visit<br>✅ Normal Delivery: KSh 30,000<br>✅ MRI/CT Scans: Covered (needs approval)<br>✅ Surgery: Covered (needs approval)<br><br>💰 Monthly contribution: KSh 500 (employed) or KSh 1,700 (self-employed)',
+  'pre-auth': '**How long does insurance approval take?**<br><br>⏱️ Jubilee Insurance: 1-2 days (can be same-day for urgent)<br>⏱️ NHIF: 2-3 days for special procedures<br>⏱️ AAR Healthcare: 3-5 days<br><br>💡 **Tip:** If it\'s urgent, call the insurance company directly — they can often approve faster over the phone.',
+  'default': 'Jambo! 👋 I\'m here to help make your work easier. Here are some things you can ask me:<br><br>• "How do I check if a procedure is covered?"<br>• "What documents do I need for insurance approval?"<br>• "How do I refer a patient to a specialist?"<br>• "What does NHIF cover?"<br><br>Just type your question in the box below and I\'ll help you out!'
+};
+
+function getAIResponse(msg) {
+  const lower = msg.toLowerCase();
+  if (lower.includes('mri') || lower.includes('pre-auth') || lower.includes('authorization')) {
+    return lower.includes('mri') ? aiResponses['mri'] : aiResponses['pre-auth'];
+  }
+  if (lower.includes('appeal') || lower.includes('denial') || lower.includes('denied')) return aiResponses['appeal'];
+  if (lower.includes('neurolog') || lower.includes('specialist') || lower.includes('find')) return aiResponses['neurologist'];
+  if (lower.includes('nhif') || lower.includes('supa cover') || lower.includes('shafarif')) return aiResponses['nhif'];
+  if (lower.includes('timeline') || lower.includes('long') || lower.includes('how long')) return aiResponses['pre-auth'];
+  return aiResponses['default'];
+}
+
+function addMsg(text, isUser) {
+  const msgs = document.getElementById('aiMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (isUser ? 'msg-user' : 'msg-ai');
+  div.innerHTML = `<div class="msg-label">${isUser ? 'You' : 'ClearCare AI'}</div>${text}`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function sendAI() {
+  const input = document.getElementById('aiInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  addMsg(msg, true);
+  input.value = '';
+
+  // typing indicator
+  const msgs = document.getElementById('aiMessages');
+  const typing = document.createElement('div');
+  typing.className = 'msg msg-ai ai-typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  setTimeout(() => {
+    typing.remove();
+    addMsg(getAIResponse(msg), false);
+  }, 900 + Math.random() * 600);
+}
+
+function askAI(msg) {
+  navigate('ai', document.querySelector('.nav-item[onclick*="ai"]'));
+  setTimeout(() => {
+    document.getElementById('aiInput').value = msg;
+    sendAI();
+  }, 100);
+}
+</script>
+</body>
+</html>

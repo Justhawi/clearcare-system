@@ -1,0 +1,15 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.sublime-*
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# System files
+*.bak
+*.tmp
